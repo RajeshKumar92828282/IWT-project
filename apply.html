@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Apply for a sample job opportunity on JobPortal.">
+  <title>Apply for a Job | JobPortal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/apply.css">
+  <script src="js/session.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/apply.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container">
+      <a href="index.html" class="brand">
+        <span class="brand-icon">J</span>
+        JobPortal<span class="brand-dot">.</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="jobs.html" class="active">Find Jobs</a>
+        <a href="companies.html">Companies</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+        <div class="mobile-auth">
+          <a href="login.html" class="btn btn-outline">Log in</a>
+          <a href="jobs.html" class="btn btn-primary">Find a Job</a>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <a href="applications.html" class="login-link">My Applications</a>
+        <a href="profile.html" class="btn btn-primary">My Profile ↗</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="apply-page">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html">Home</a><span>/</span>
+        <a href="jobs.html">Find Jobs</a><span>/</span>
+        <span>Apply</span>
+      </div>
+
+      <div class="apply-page-heading">
+        <span class="section-kicker">TAKE THE NEXT STEP</span>
+        <h1>Submit your application.</h1>
+        <p>Complete the form below to create a demo job application.</p>
+      </div>
+
+      <div id="applyNotice" class="apply-notice" role="status" aria-live="polite" hidden></div>
+
+      <div class="apply-layout">
+        <section class="application-form-card">
+          <div class="application-card-heading">
+            <span class="application-step">01</span>
+            <div>
+              <h2>Application details</h2>
+              <p>Share your information for this sample role.</p>
+            </div>
+          </div>
+
+          <form id="applicationForm">
+            <div class="selected-job-box">
+              <div class="selected-job-logo" id="selectedJobLogo">J</div>
+              <div class="selected-job-info">
+                <span class="section-kicker">APPLYING FOR</span>
+                <h3 id="selectedJobTitle">Loading job...</h3>
+                <p id="selectedJobCompany"></p>
+                <a href="jobs.html" class="text-link">Choose another job →</a>
+              </div>
+            </div>
+
+            <div class="application-form-section">
+              <h3>Personal information</h3>
+              <div class="apply-form-grid">
+                <label class="apply-field">
+                  <span>Full name *</span>
+                  <input type="text" id="applicantName" maxlength="80" required placeholder="Your full name">
+                </label>
+
+                <label class="apply-field">
+                  <span>Email address *</span>
+                  <input type="email" id="applicantEmail" required maxlength="150" placeholder="you@example.com" readonly>
+                </label>
+
+                <label class="apply-field">
+                  <span>Phone number *</span>
+                  <input type="tel" id="applicantPhone" required maxlength="20" placeholder="+91 98765 43210">
+                </label>
+
+                <label class="apply-field">
+                  <span>Current location *</span>
+                  <input type="text" id="applicantLocation" required maxlength="100" placeholder="City, State">
+                </label>
+              </div>
+            </div>
+
+            <div class="application-form-section">
+              <h3>Resume & introduction</h3>
+
+              <label class="apply-field">
+                <span>Resume file *</span>
+                <input type="file" id="resumeFile" accept=".pdf,.doc,.docx" required>
+                <small>Select a PDF or Word document. The file will not be uploaded.</small>
+                <span id="resumeFileName" class="file-name"></span>
+              </label>
+
+              <label class="apply-field cover-letter-field">
+                <span>Cover letter *</span>
+                <textarea id="coverLetter" rows="6" minlength="30" maxlength="1500" required placeholder="Explain why you're interested in this role and what you can contribute."></textarea>
+                <small>Write between 30 and 1,500 characters.</small>
+              </label>
+            </div>
+
+            <label class="apply-consent">
+              <input type="checkbox" id="applicationConsent" required>
+              <span>I understand this is a student project demo and my application will only be saved in this browser.</span>
+            </label>
+
+            <div class="application-actions">
+              <a href="jobs.html" class="btn btn-outline">Cancel</a>
+              <button type="submit" class="btn btn-primary">Submit application →</button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="apply-sidebar">
+          <div class="application-summary-card">
+            <span class="section-kicker">APPLICATION SUMMARY</span>
+            <h2>You're almost there.</h2>
+            <p>Review these details before submitting your demo application.</p>
+
+            <div class="summary-line">
+              <span>Position</span>
+              <strong id="summaryPosition">Loading...</strong>
+            </div>
+            <div class="summary-line">
+              <span>Company</span>
+              <strong id="summaryCompany">Loading...</strong>
+            </div>
+            <div class="summary-line">
+              <span>Application type</span>
+              <strong>Online demo</strong>
+            </div>
+            <div class="summary-line">
+              <span>Submission date</span>
+              <strong id="submissionDate">Today</strong>
+            </div>
+
+            <div class="summary-security">
+              <span>✓</span>
+              <p><strong>Demo privacy</strong><br>Your form data stays in this browser. No employer receives it.</p>
+            </div>
+          </div>
+
+          <div class="application-help-card">
+            <span class="help-icon">✦</span>
+            <h3>Before you submit</h3>
+            <p>Use a clear resume filename and write a short, role-specific introduction. Never upload sensitive documents to this demo.</p>
+            <a href="profile.html" class="text-link">Review your profile →</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <span>© <span id="currentYear">2026</span> JobPortal. Student project demo.</span>
+      <a href="index.html">Return to home →</a>
+    </div>
+  </footer>
+</body>
+</html>

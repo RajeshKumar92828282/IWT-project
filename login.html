@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sign in or create a demo JobPortal account.">
+  <title>Login & Register | JobPortal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <script src="js/session.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/auth.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container">
+      <a href="index.html" class="brand">
+        <span class="brand-icon">J</span>
+        JobPortal<span class="brand-dot">.</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Find Jobs</a>
+        <a href="companies.html">Companies</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+        <div class="mobile-auth">
+          <a href="login.html" class="btn btn-outline">Log in</a>
+          <a href="jobs.html" class="btn btn-primary">Find a Job</a>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <a href="jobs.html" class="login-link">Browse jobs</a>
+        <a href="index.html" class="btn btn-primary">Home ↗</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="auth-page">
+    <section class="auth-shell">
+      <div class="auth-intro">
+        <span class="section-kicker">YOUR CAREER JOURNEY</span>
+        <h1>Great opportunities start with <span>one step.</span></h1>
+        <p>Create your demo account to explore job applications and manage your profile in JobPortal.</p>
+
+        <div class="auth-benefits">
+          <div><span>✓</span><p><strong>Discover opportunities</strong><small>Explore roles across career categories.</small></p></div>
+          <div><span>✓</span><p><strong>Track your progress</strong><small>View demo application statuses.</small></p></div>
+          <div><span>✓</span><p><strong>Manage your profile</strong><small>Keep your career information organized.</small></p></div>
+        </div>
+
+        <div class="auth-quote">
+          <span>“</span>
+          <p>Your next opportunity begins with the decision to take the first step.</p>
+        </div>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-tabs" role="tablist" aria-label="Account options">
+          <button type="button" class="auth-tab is-active" id="loginTab" role="tab" aria-selected="true">Sign in</button>
+          <button type="button" class="auth-tab" id="registerTab" role="tab" aria-selected="false">Create account</button>
+        </div>
+
+        <div id="authMessage" class="auth-message" role="status" aria-live="polite" hidden></div>
+
+        <form id="loginForm" class="auth-form">
+          <div class="auth-heading">
+            <h2>Welcome back</h2>
+            <p>Enter your demo account details below.</p>
+          </div>
+
+          <label class="form-field">
+            <span>Email address</span>
+            <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" required>
+          </label>
+
+          <label class="form-field">
+            <span>Password</span>
+            <span class="password-wrap">
+              <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" minlength="6" required>
+              <button type="button" class="password-toggle" data-password="loginPassword" aria-label="Show password">Show</button>
+            </span>
+          </label>
+
+          <button type="submit" class="btn btn-primary auth-submit">Sign in to JobPortal →</button>
+          <p class="auth-switch-text">New to JobPortal? <button type="button" data-switch="register">Create an account</button></p>
+        </form>
+
+        <form id="registerForm" class="auth-form" hidden>
+          <div class="auth-heading">
+            <h2>Create your account</h2>
+            <p>Enter your details to create a local demo account.</p>
+          </div>
+
+          <label class="form-field">
+            <span>Full name</span>
+            <input type="text" id="registerName" placeholder="Your full name" autocomplete="name" minlength="2" maxlength="80" required>
+          </label>
+
+          <label class="form-field">
+            <span>Email address</span>
+            <input type="email" id="registerEmail" placeholder="you@example.com" autocomplete="email" required>
+          </label>
+
+          <label class="form-field">
+            <span>Password</span>
+            <span class="password-wrap">
+              <input type="password" id="registerPassword" placeholder="At least 8 characters" autocomplete="new-password" minlength="8" required>
+              <button type="button" class="password-toggle" data-password="registerPassword" aria-label="Show password">Show</button>
+            </span>
+          </label>
+
+          <label class="form-field">
+            <span>Confirm password</span>
+            <input type="password" id="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password" minlength="8" required>
+          </label>
+
+          <label class="terms-check">
+            <input type="checkbox" id="acceptTerms" required>
+            <span>I understand this is a frontend demo account stored in this browser.</span>
+          </label>
+
+          <button type="submit" class="btn btn-primary auth-submit">Create demo account →</button>
+          <p class="auth-switch-text">Already registered? <button type="button" data-switch="login">Sign in</button></p>
+        </form>
+
+        <div class="auth-footnote">
+          Demo only. Do not use a real password or sensitive personal information.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <span>© <span id="currentYear">2026</span> JobPortal. Student project demo.</span>
+      <a href="index.html">Return to home →</a>
+    </div>
+  </footer>
+</body>
+</html>

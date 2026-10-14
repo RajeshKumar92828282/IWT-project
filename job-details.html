@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View job responsibilities, requirements and application details.">
+  <title>Job Details | JobPortal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/job-details.css">
+  <script src="js/session.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/job-details.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container">
+      <a href="index.html" class="brand">
+        <span class="brand-icon">J</span>
+        JobPortal<span class="brand-dot">.</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="jobs.html" class="active">Find Jobs</a>
+        <a href="companies.html">Companies</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+        <div class="mobile-auth">
+          <a href="login.html" class="btn btn-outline">Log in</a>
+          <a href="jobs.html" class="btn btn-primary">Find a Job</a>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <a href="login.html" class="login-link">Log in</a>
+        <a href="profile.html" class="btn btn-primary">My Profile ↗</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="detail-page">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html">Home</a><span>/</span>
+        <a href="jobs.html">Find Jobs</a><span>/</span>
+        <span>Job Details</span>
+      </div>
+
+      <section id="jobDetailContent" class="detail-layout">
+        <div class="detail-main">
+          <div class="detail-header">
+            <div class="detail-company-logo" id="detailLogo">J</div>
+            <div class="detail-title">
+              <span class="section-kicker">JOB OPPORTUNITY</span>
+              <h1 id="detailTitle">Loading job details...</h1>
+              <p id="detailCompany"></p>
+            </div>
+          </div>
+
+          <div class="detail-tags" id="detailTags"></div>
+
+          <div class="detail-divider"></div>
+
+          <section class="detail-section">
+            <h2>About the role</h2>
+            <p id="detailDescription"></p>
+          </section>
+
+          <section class="detail-section">
+            <h2>Key responsibilities</h2>
+            <ul id="detailResponsibilities"></ul>
+          </section>
+
+          <section class="detail-section">
+            <h2>Requirements</h2>
+            <ul id="detailRequirements"></ul>
+          </section>
+
+          <section class="detail-section">
+            <h2>Skills you'll work with</h2>
+            <div class="detail-skills" id="detailSkills"></div>
+          </section>
+
+          <div class="detail-disclaimer">
+            <strong>Student project demo</strong>
+            <p>This is an illustrative job listing. Company details, compensation and vacancy information have not been independently verified.</p>
+          </div>
+        </div>
+
+        <aside class="detail-sidebar">
+          <div class="apply-card">
+            <span class="section-kicker">YOUR NEXT STEP</span>
+            <h2>Interested in this role?</h2>
+            <p>Review the details and continue to the demo application form.</p>
+            <div class="apply-salary-label">Illustrative compensation</div>
+            <strong class="apply-salary" id="detailSalary"></strong>
+            <a href="apply.html" id="applyNow" class="btn btn-primary apply-now">Apply for this job →</a>
+            <button type="button" id="saveDetailJob" class="btn btn-outline save-detail-btn">♡ Save this job</button>
+            <p class="apply-note">Demo application only. No employer receives your information.</p>
+          </div>
+
+          <div class="company-card">
+            <h3>About the company</h3>
+            <div class="company-mini">
+              <div class="company-mini-logo" id="companyMiniLogo">J</div>
+              <div>
+                <strong id="companyMiniName">Company</strong>
+                <p>Sample employer profile</p>
+              </div>
+            </div>
+            <p class="company-note">This company profile is provided for demonstration purposes as part of the JobPortal student project.</p>
+            <a href="companies.html" class="text-link">Explore companies →</a>
+          </div>
+        </aside>
+      </section>
+
+      <section id="jobNotFound" class="not-found" hidden>
+        <div class="empty-icon">⌕</div>
+        <h1>Job not found</h1>
+        <p>This job ID does not match any sample listing.</p>
+        <a href="jobs.html" class="btn btn-primary">Browse all jobs</a>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-main">
+      <div class="footer-brand">
+        <a href="index.html" class="brand"><span class="brand-icon">J</span> JobPortal<span class="brand-dot">.</span></a>
+        <p>A simpler way to discover opportunities and build your future.</p>
+      </div>
+      <div class="footer-column">
+        <strong>Explore</strong>
+        <a href="jobs.html">Find Jobs</a>
+        <a href="companies.html">Companies</a>
+        <a href="applications.html">My Applications</a>
+      </div>
+      <div class="footer-column">
+        <strong>Company</strong>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html">Sign In</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© <span id="currentYear">2026</span> JobPortal. Student project demo.</span>
+      <span>Designed for your next opportunity.</span>
+    </div>
+  </footer>
+</body>
+</html>

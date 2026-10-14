@@ -1,0 +1,351 @@
+
+.detail-page {
+  min-height: 65vh;
+  padding: 30px 0 75px;
+  background: #fbfcfe;
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 11px;
+  align-items: center;
+  margin-bottom: 27px;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.breadcrumb a {
+  color: #64748b;
+}
+
+.breadcrumb a:hover {
+  color: var(--primary);
+}
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  align-items: start;
+  gap: 26px;
+}
+
+.detail-main,
+.apply-card,
+.company-card {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: white;
+}
+
+.detail-main {
+  padding: 32px;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.detail-company-logo {
+  width: 68px;
+  height: 68px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  background: #eff6ff;
+  color: var(--primary);
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.detail-title h1 {
+  margin-top: 7px;
+  font-size: clamp(24px, 3vw, 34px);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -1.2px;
+}
+
+.detail-title p {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.detail-tags,
+.detail-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.detail-tags {
+  margin-top: 25px;
+}
+
+.detail-tag {
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  background: #fff;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.detail-tag.tag-blue {
+  border-color: #dbeafe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.detail-divider {
+  height: 1px;
+  margin: 28px 0;
+  background: var(--border);
+}
+
+.detail-section {
+  margin-top: 28px;
+}
+
+.detail-section:first-of-type {
+  margin-top: 0;
+}
+
+.detail-section h2 {
+  margin-bottom: 13px;
+  font-size: 17px;
+  letter-spacing: -0.4px;
+}
+
+.detail-section p,
+.detail-section li {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+.detail-section ul {
+  padding-left: 20px;
+}
+
+.detail-section li {
+  padding-left: 4px;
+  margin-bottom: 8px;
+}
+
+.detail-section li::marker {
+  color: var(--primary);
+}
+
+.detail-skills {
+  margin-top: 14px;
+}
+
+.detail-skills span {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.detail-disclaimer {
+  margin-top: 35px;
+  padding: 17px;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  background: #f8fbff;
+}
+
+.detail-disclaimer strong {
+  color: #1d4ed8;
+  font-size: 11px;
+}
+
+.detail-disclaimer p {
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+/* Sidebar */
+
+.detail-sidebar {
+  display: grid;
+  gap: 18px;
+}
+
+.apply-card {
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.035);
+}
+
+.apply-card h2 {
+  margin-top: 12px;
+  font-size: 21px;
+  line-height: 1.35;
+  letter-spacing: -0.7px;
+}
+
+.apply-card > p {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.apply-salary-label {
+  margin-top: 23px;
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.apply-salary {
+  display: block;
+  margin-top: 4px;
+  font-size: 23px;
+  letter-spacing: -0.8px;
+}
+
+.apply-now {
+  width: 100%;
+  margin-top: 21px;
+}
+
+.save-detail-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.apply-card .apply-note {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 9px;
+}
+
+.company-card {
+  padding: 22px;
+}
+
+.company-card > h3 {
+  font-size: 14px;
+}
+
+.company-mini {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.company-mini-logo {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #eff6ff;
+  color: var(--primary);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.company-mini strong {
+  font-size: 12px;
+}
+
+.company-mini p {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.company-note {
+  margin-top: 17px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.9;
+}
+
+.company-card .text-link {
+  margin-top: 17px;
+  font-size: 11px;
+}
+
+.not-found {
+  padding: 70px 20px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: white;
+  text-align: center;
+}
+
+.not-found h1 {
+  margin-top: 12px;
+  font-size: 28px;
+}
+
+.not-found p {
+  margin: 10px 0 23px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .detail-layout {
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 18px;
+  }
+
+  .detail-main {
+    padding: 24px;
+  }
+
+  .apply-card {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 700px) {
+  .detail-page {
+    padding-top: 22px;
+  }
+
+  .detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-main {
+    padding: 22px 18px;
+  }
+
+  .detail-header {
+    align-items: flex-start;
+    gap: 13px;
+  }
+
+  .detail-company-logo {
+    width: 53px;
+    height: 53px;
+    border-radius: 13px;
+    font-size: 23px;
+  }
+
+  .detail-title h1 {
+    font-size: 24px;
+  }
+
+  .detail-sidebar {
+    grid-template-columns: 1fr;
+  }
+}

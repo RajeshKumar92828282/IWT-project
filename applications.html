@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Track your job applications and review application details in your JobPortal dashboard.">
+  <title>My Applications | JobPortal</title>
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/applications.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="navbar container">
+      <a href="index.html" class="brand" aria-label="JobPortal home">
+        <span class="brand-icon">J</span>
+        <span>JobPortal<span class="brand-dot">.</span></span>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle"
+        type="button" aria-label="Open navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Find Jobs</a>
+        <a href="companies.html">Companies</a>
+        <a href="about.html">About</a>
+        <a href="applications.html" class="active">My Applications</a>
+
+        <div class="mobile-auth">
+          <a href="profile.html">My Profile</a>
+          <a href="login.html">Sign In</a>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <a href="login.html" class="nav-login">Sign In</a>
+        <a href="profile.html" class="btn btn-primary nav-cta">My Profile</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="applications-page">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a>
+      <span> / </span>
+      <span>My Applications</span>
+    </div>
+
+    <div class="applications-container">
+      <section class="applications-heading">
+        <div>
+          <p class="applications-eyebrow">Your career dashboard</p>
+          <h1>My Applications</h1>
+          <p>
+            Keep track of the jobs you've applied for, review their details,
+            and manage your application records in one place.
+          </p>
+        </div>
+
+        <a href="jobs.html" class="browse-jobs-btn">Browse Jobs &rarr;</a>
+      </section>
+
+      <div
+        id="applicationNotice"
+        class="application-notice"
+        role="status"
+        aria-live="polite">
+      </div>
+
+      <section class="application-stats" aria-label="Application summary">
+        <article class="application-stat">
+          <div class="application-stat-icon" aria-hidden="true">▤</div>
+          <div>
+            <p class="application-stat-label">Total Applications</p>
+            <p class="application-stat-value" id="totalApplications">0</p>
+          </div>
+        </article>
+
+        <article class="application-stat">
+          <div class="application-stat-icon" aria-hidden="true">◷</div>
+          <div>
+            <p class="application-stat-label">In Progress</p>
+            <p class="application-stat-value" id="activeApplications">0</p>
+          </div>
+        </article>
+
+        <article class="application-stat">
+          <div class="application-stat-icon" aria-hidden="true">♡</div>
+          <div>
+            <p class="application-stat-label">Saved Jobs</p>
+            <p class="application-stat-value" id="savedJobsCount">0</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="applications-panel">
+        <div class="applications-panel-header">
+          <div>
+            <h2>Application History</h2>
+            <p id="applicationCountText">Your submitted applications will appear here.</p>
+          </div>
+        </div>
+
+        <div class="applications-filters">
+          <input
+            type="search"
+            id="applicationSearch"
+            placeholder="Search by job title or company..."
+            aria-label="Search applications">
+
+          <select id="statusFilter" aria-label="Filter by application status">
+            <option value="all">All statuses</option>
+            <option value="Applied">Applied</option>
+            <option value="Under Review">Under Review</option>
+            <option value="Shortlisted">Shortlisted</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+
+        <div class="application-list" id="applicationList">
+          <!-- Application cards are rendered by applications.js -->
+        </div>
+
+        <div class="applications-demo-note">
+          <strong>Student project demo:</strong>
+          Application records are stored in this browser using LocalStorage.
+          They are not sent to a real employer, and the displayed status is
+          only a demonstration. Clearing browser data may remove these records.
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <p>&copy; <span id="currentYear"></span> JobPortal. Built for learning and demonstration.</p>
+      <div>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/session.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/applications.js"></script>
+</body>
+</html>

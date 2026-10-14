@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact the JobPortal demo team using our contact form.">
+  <title>Contact Us | JobPortal</title>
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/contact.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="navbar container">
+      <a href="index.html" class="brand" aria-label="JobPortal home">
+        <span class="brand-icon">J</span>
+        <span>JobPortal<span class="brand-dot">.</span></span>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle"
+        type="button" aria-label="Open navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Find Jobs</a>
+        <a href="companies.html">Companies</a>
+        <a href="about.html">About</a>
+        <a href="applications.html">My Applications</a>
+
+        <div class="mobile-auth">
+          <a href="profile.html">My Profile</a>
+          <a href="login.html">Sign In</a>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <a href="login.html" class="nav-login">Sign In</a>
+        <a href="profile.html" class="btn btn-primary nav-cta">My Profile</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="contact-page">
+    <div class="contact-container">
+      <div class="contact-breadcrumb">
+        <a href="index.html">Home</a>
+        <span> / </span>
+        <span>Contact Us</span>
+      </div>
+
+      <section class="contact-hero">
+        <p class="contact-eyebrow">We're here to help</p>
+        <h1>Let's start a conversation.</h1>
+        <p>
+          Have a question about the JobPortal project? Use the form below
+          to practise submitting a support request.
+        </p>
+      </section>
+
+      <section class="contact-layout">
+        <aside class="contact-info-panel">
+          <h2>Get in touch</h2>
+          <p class="contact-info-intro">
+            This page is part of a student-built job portal. The contact
+            details below are examples for the project demonstration.
+          </p>
+
+          <div class="contact-info-list">
+            <div class="contact-info-item">
+              <div class="contact-info-icon" aria-hidden="true">✉</div>
+              <div>
+                <h3>Email</h3>
+                <p>support@example.com</p>
+              </div>
+            </div>
+
+            <div class="contact-info-item">
+              <div class="contact-info-icon" aria-hidden="true">⌖</div>
+              <div>
+                <h3>Location</h3>
+                <p>Bhubaneswar, Odisha, India</p>
+              </div>
+            </div>
+
+            <div class="contact-info-item">
+              <div class="contact-info-icon" aria-hidden="true">◷</div>
+              <div>
+                <h3>Availability</h3>
+                <p>Monday–Friday<br>10:00 AM–5:00 PM</p>
+              </div>
+            </div>
+          </div>
+
+          <p class="contact-info-footnote">
+            These are illustrative contact details, not a monitored
+            customer support service.
+          </p>
+        </aside>
+
+        <section class="contact-form-panel">
+          <h2>Send us a message</h2>
+          <p class="contact-form-description">
+            Fill in the details below. All fields are required.
+          </p>
+
+          <div
+            id="contactFeedback"
+            class="contact-feedback"
+            role="status"
+            aria-live="polite">
+          </div>
+
+          <form id="contactForm" class="contact-form" novalidate>
+            <div class="contact-form-row">
+              <div class="contact-field">
+                <label for="contactName">Full name</label>
+                <input
+                  type="text"
+                  id="contactName"
+                  name="name"
+                  placeholder="Enter your name"
+                  autocomplete="name"
+                  minlength="2"
+                  maxlength="80"
+                  required>
+                <span class="contact-field-error" id="nameError"></span>
+              </div>
+
+              <div class="contact-field">
+                <label for="contactEmail">Email address</label>
+                <input
+                  type="email"
+                  id="contactEmail"
+                  name="email"
+                  placeholder="you@example.com"
+                  autocomplete="email"
+                  maxlength="254"
+                  required>
+                <span class="contact-field-error" id="emailError"></span>
+              </div>
+            </div>
+
+            <div class="contact-field">
+              <label for="contactSubject">Subject</label>
+              <select id="contactSubject" name="subject" required>
+                <option value="">Choose a subject</option>
+                <option value="General enquiry">General enquiry</option>
+                <option value="Technical support">Technical support</option>
+                <option value="Job listing question">Job listing question</option>
+                <option value="Feedback">Feedback</option>
+                <option value="Other">Other</option>
+              </select>
+              <span class="contact-field-error" id="subjectError"></span>
+            </div>
+
+            <div class="contact-field">
+              <label for="contactMessage">Your message</label>
+              <textarea
+                id="contactMessage"
+                name="message"
+                placeholder="Tell us how we can help..."
+                minlength="10"
+                maxlength="1000"
+                required></textarea>
+
+              <div class="contact-character-count">
+                <span id="messageCount">0</span>/1000 characters
+              </div>
+
+              <span class="contact-field-error" id="messageError"></span>
+            </div>
+
+            <label class="contact-consent">
+              <input type="checkbox" id="contactConsent" required>
+              <span>
+                I understand this is a demonstration form and my message
+                will not be sent to a real support team.
+              </span>
+            </label>
+
+            <span class="contact-field-error" id="consentError"></span>
+
+            <button type="submit" class="contact-submit">
+              Submit Message &rarr;
+            </button>
+          </form>
+
+          <p class="contact-demo-note">
+            Demo only: this form validates your entries in the browser.
+            It does not send email or store your message.
+          </p>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <p>&copy; <span id="currentYear"></span> JobPortal. Built for learning and demonstration.</p>
+      <div>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/session.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/contact.js"></script>
+</body>
+</html>

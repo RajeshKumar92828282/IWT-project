@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Browse and filter job opportunities on JobPortal.">
+  <title>Find Jobs | JobPortal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/jobs.css">
+  <script src="js/session.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/jobs.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container">
+      <a href="index.html" class="brand">
+        <span class="brand-icon">J</span>
+        JobPortal<span class="brand-dot">.</span>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="jobs.html" class="active">Find Jobs</a>
+        <a href="companies.html">Companies</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+        <div class="mobile-auth">
+          <a href="login.html" class="btn btn-outline">Log in</a>
+          <a href="jobs.html" class="btn btn-primary">Find a Job</a>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <a href="login.html" class="login-link">Log in</a>
+        <a href="profile.html" class="btn btn-primary">My Profile ↗</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="jobs-hero">
+      <div class="container">
+        <span class="section-kicker">YOUR NEXT OPPORTUNITY</span>
+        <h1>Find a job that fits <span>your future.</span></h1>
+        <p>Explore sample openings, discover new roles, and find the right next step for your career.</p>
+
+        <form id="jobsSearch" class="jobs-search">
+          <label class="jobs-search-field">
+            <span>⌕</span>
+            <input type="search" id="jobKeyword" placeholder="Job title, skill or company">
+          </label>
+          <label class="jobs-search-field">
+            <span>⌖</span>
+            <input type="text" id="jobLocation" placeholder="City or remote">
+          </label>
+          <button class="btn btn-primary" type="submit">Search jobs →</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="container jobs-layout">
+      <aside class="filter-panel">
+        <div class="filter-heading">
+          <h2>Filters</h2>
+          <button type="button" id="resetFilters" class="reset-button">Reset all</button>
+        </div>
+
+        <div class="filter-group">
+          <h3>Job category</h3>
+          <label class="filter-option"><input type="checkbox" name="category" value="Technology"> Technology</label>
+          <label class="filter-option"><input type="checkbox" name="category" value="Design"> Design</label>
+          <label class="filter-option"><input type="checkbox" name="category" value="Marketing"> Marketing</label>
+          <label class="filter-option"><input type="checkbox" name="category" value="Business"> Business</label>
+        </div>
+
+        <div class="filter-group">
+          <h3>Employment type</h3>
+          <label class="filter-option"><input type="checkbox" name="type" value="Full-time"> Full-time</label>
+          <label class="filter-option"><input type="checkbox" name="type" value="Part-time"> Part-time</label>
+          <label class="filter-option"><input type="checkbox" name="type" value="Internship"> Internship</label>
+          <label class="filter-option"><input type="checkbox" name="type" value="Contract"> Contract</label>
+        </div>
+
+        <div class="filter-group">
+          <h3>Work arrangement</h3>
+          <label class="filter-option"><input type="checkbox" name="work" value="On-site"> On-site</label>
+          <label class="filter-option"><input type="checkbox" name="work" value="Hybrid"> Hybrid</label>
+          <label class="filter-option"><input type="checkbox" name="work" value="Remote"> Remote</label>
+        </div>
+      </aside>
+
+      <section class="jobs-results">
+        <div class="results-heading">
+          <div>
+            <h2>Explore opportunities</h2>
+            <p id="resultsCount" aria-live="polite">Loading jobs...</p>
+          </div>
+
+          <label class="sort-control">
+            <span>Sort by</span>
+            <select id="sortJobs">
+              <option value="recommended">Recommended</option>
+              <option value="title">Job title A–Z</option>
+              <option value="company">Company A–Z</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="activeFilters" class="active-filters"></div>
+        <div id="jobsList" class="jobs-list"></div>
+
+        <div id="emptyState" class="empty-state" hidden>
+          <div class="empty-icon">⌕</div>
+          <h3>No matching jobs found</h3>
+          <p>Try changing your keywords or removing some filters.</p>
+          <button type="button" id="emptyReset" class="btn btn-primary">Clear filters</button>
+        </div>
+
+        <p class="demo-note">These are illustrative listings created for a student project. They are not verified live vacancies.</p>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-main">
+      <div class="footer-brand">
+        <a href="index.html" class="brand"><span class="brand-icon">J</span> JobPortal<span class="brand-dot">.</span></a>
+        <p>A simpler way to discover opportunities and build your future.</p>
+      </div>
+      <div class="footer-column">
+        <strong>Explore</strong>
+        <a href="jobs.html">Find Jobs</a>
+        <a href="companies.html">Companies</a>
+        <a href="applications.html">My Applications</a>
+      </div>
+      <div class="footer-column">
+        <strong>Company</strong>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html">Sign In</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© <span id="currentYear">2026</span> JobPortal. Student project demo.</span>
+      <span>Designed for your next opportunity.</span>
+    </div>
+  </footer>
+</body>
+</html>

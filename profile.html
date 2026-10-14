@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage your JobPortal demo applicant profile and career details.">
+  <title>My Profile | JobPortal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/profile.css">
+  <script src="js/session.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/profile.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container">
+      <a href="index.html" class="brand">
+        <span class="brand-icon">J</span>
+        JobPortal<span class="brand-dot">.</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Find Jobs</a>
+        <a href="companies.html">Companies</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+        <div class="mobile-auth">
+          <a href="login.html" class="btn btn-outline">Log in</a>
+          <a href="jobs.html" class="btn btn-primary">Find a Job</a>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <a href="applications.html" class="login-link">My Applications</a>
+        <a href="jobs.html" class="btn btn-primary">Explore Jobs ↗</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="profile-page">
+    <div class="container">
+      <div class="profile-page-heading">
+        <div>
+          <span class="section-kicker">YOUR CAREER SPACE</span>
+          <h1>My Profile</h1>
+          <p>Keep your professional information up to date.</p>
+        </div>
+        <a href="jobs.html" class="btn btn-primary">Find opportunities →</a>
+      </div>
+
+      <div id="profileNotice" class="profile-notice" role="status" aria-live="polite" hidden></div>
+
+      <section class="profile-layout">
+        <aside class="profile-sidebar">
+          <div class="profile-summary">
+            <div class="profile-avatar" id="profileAvatar">JD</div>
+            <h2 id="summaryName">Your Name</h2>
+            <p id="summaryHeadline">Job seeker</p>
+            <span class="profile-status"><span></span> Demo profile</span>
+            <div class="profile-summary-divider"></div>
+            <div class="summary-detail"><span>✉</span><span id="summaryEmail">Not provided</span></div>
+            <div class="summary-detail"><span>⌖</span><span id="summaryLocation">Location not set</span></div>
+            <a href="applications.html" class="profile-app-link">View my applications →</a>
+          </div>
+
+          <div class="completion-card">
+            <div class="completion-top">
+              <h3>Profile completion</h3>
+              <strong id="completionPercent">0%</strong>
+            </div>
+            <div class="completion-track"><span id="completionBar"></span></div>
+            <p>Complete your details to build a stronger profile.</p>
+          </div>
+
+          <div class="profile-tip">
+            <span>✦</span>
+            <div>
+              <strong>Career tip</strong>
+              <p>Add relevant skills and education to present your strengths clearly.</p>
+            </div>
+          </div>
+        </aside>
+
+        <div class="profile-content">
+          <form id="profileForm">
+            <section class="profile-section">
+              <div class="profile-section-heading">
+                <div>
+                  <span class="section-kicker">01 / PERSONAL</span>
+                  <h2>Personal information</h2>
+                  <p>Tell employers a little about yourself.</p>
+                </div>
+              </div>
+
+              <div class="profile-form-grid">
+                <label class="profile-field">
+                  <span>Full name *</span>
+                  <input type="text" id="fullName" name="fullName" required minlength="2" maxlength="80" placeholder="Your full name">
+                </label>
+
+                <label class="profile-field">
+                  <span>Email address *</span>
+                  <input type="email" id="email" name="email" required readonly>
+                  <small>Email is tied to your demo account.</small>
+                </label>
+
+                <label class="profile-field">
+                  <span>Phone number</span>
+                  <input type="tel" id="phone" name="phone" maxlength="20" placeholder="+91 98765 43210">
+                </label>
+
+                <label class="profile-field">
+                  <span>Current location</span>
+                  <input type="text" id="location" name="location" maxlength="100" placeholder="City, State">
+                </label>
+
+                <label class="profile-field full-width">
+                  <span>Professional headline</span>
+                  <input type="text" id="headline" name="headline" maxlength="120" placeholder="e.g. BCA Student | Aspiring Frontend Developer">
+                </label>
+
+                <label class="profile-field full-width">
+                  <span>About me</span>
+                  <textarea id="bio" name="bio" rows="4" maxlength="600" placeholder="Write a short introduction about your interests, strengths and career goals."></textarea>
+                  <small>Maximum 600 characters.</small>
+                </label>
+              </div>
+            </section>
+
+            <section class="profile-section">
+              <div class="profile-section-heading">
+                <div>
+                  <span class="section-kicker">02 / EXPERTISE</span>
+                  <h2>Skills & expertise</h2>
+                  <p>Add skills relevant to the roles you want.</p>
+                </div>
+              </div>
+
+              <label class="profile-field">
+                <span>Skills, separated by commas</span>
+                <input type="text" id="skills" name="skills" maxlength="500" placeholder="HTML, CSS, JavaScript, Communication">
+              </label>
+              <div class="skill-preview" id="skillPreview"></div>
+            </section>
+
+            <section class="profile-section">
+              <div class="profile-section-heading">
+                <div>
+                  <span class="section-kicker">03 / EDUCATION</span>
+                  <h2>Education</h2>
+                  <p>Highlight your academic background.</p>
+                </div>
+              </div>
+
+              <div class="profile-form-grid">
+                <label class="profile-field">
+                  <span>Degree or qualification</span>
+                  <input type="text" id="degree" name="degree" maxlength="120" placeholder="e.g. Bachelor of Computer Applications">
+                </label>
+
+                <label class="profile-field">
+                  <span>Institution</span>
+                  <input type="text" id="institution" name="institution" maxlength="150" placeholder="College or university">
+                </label>
+
+                <label class="profile-field">
+                  <span>Graduation year</span>
+                  <input type="number" id="graduationYear" name="graduationYear" min="2020" max="2045" placeholder="2029">
+                </label>
+
+                <label class="profile-field">
+                  <span>Portfolio or GitHub URL</span>
+                  <input type="url" id="portfolio" name="portfolio" maxlength="250" placeholder="https://github.com/yourusername">
+                </label>
+              </div>
+            </section>
+
+            <div class="profile-form-actions">
+              <button type="reset" class="btn btn-outline">Reset changes</button>
+              <button type="submit" class="btn btn-primary">Save profile changes →</button>
+            </div>
+          </form>
+
+          <section class="profile-section account-section">
+            <div class="profile-section-heading">
+              <div>
+                <span class="section-kicker">ACCOUNT</span>
+                <h2>Demo account</h2>
+                <p>Sign out of the current local demo session.</p>
+              </div>
+            </div>
+            <button type="button" class="btn btn-outline" id="logoutButton">Sign out</button>
+          </section>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <span>© <span id="currentYear">2026</span> JobPortal. Student project demo.</span>
+      <a href="index.html">Return to home →</a>
+    </div>
+  </footer>
+</body>
+</html>

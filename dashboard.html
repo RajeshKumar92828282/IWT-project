@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Review your JobPortal demo applications, saved jobs, and profile progress.">
+  <title>Dashboard | JobPortal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <script src="js/session.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/dashboard.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container">
+      <a href="index.html" class="brand" aria-label="JobPortal home">
+        <span class="brand-icon">J</span>JobPortal<span class="brand-dot">.</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" type="button"
+        aria-label="Toggle navigation" aria-expanded="false">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Find Jobs</a>
+        <a href="companies.html">Companies</a>
+        <a href="about.html">About</a>
+        <div class="mobile-auth"></div>
+      </div>
+      <div class="nav-actions"></div>
+    </nav>
+  </header>
+
+  <main class="dashboard-page">
+    <div class="container">
+      <section class="dashboard-welcome">
+        <div>
+          <span class="section-kicker">YOUR CAREER SPACE</span>
+          <h1>Welcome back, <span id="welcomeName">there</span></h1>
+          <p>Review your activity and keep your career profile up to date.</p>
+        </div>
+        <a href="jobs.html" class="btn btn-primary">Find opportunities →</a>
+      </section>
+
+      <section class="dashboard-account" aria-label="Account information">
+        <div class="dashboard-avatar" id="dashboardAvatar">J</div>
+        <div>
+          <h2 id="dashboardName">Job seeker</h2>
+          <p id="dashboardEmail"></p>
+        </div>
+        <a href="profile.html" class="dashboard-inline-link">Edit profile →</a>
+      </section>
+
+      <section class="dashboard-stats" aria-label="Your activity">
+        <article class="dashboard-stat">
+          <span class="dashboard-stat-icon">▤</span>
+          <div><p>Total applications</p><strong id="totalApplications">0</strong></div>
+        </article>
+        <article class="dashboard-stat">
+          <span class="dashboard-stat-icon saved">♡</span>
+          <div><p>Saved jobs</p><strong id="savedJobsCount">0</strong></div>
+        </article>
+        <article class="dashboard-stat">
+          <span class="dashboard-stat-icon progress">◷</span>
+          <div><p>In progress</p><strong id="inProgressApplications">0</strong></div>
+        </article>
+        <article class="dashboard-stat">
+          <span class="dashboard-stat-icon completion">✓</span>
+          <div><p>Profile complete</p><strong id="profileCompletion">0%</strong></div>
+        </article>
+      </section>
+
+      <section class="dashboard-columns">
+        <article class="dashboard-panel">
+          <div class="dashboard-panel-heading">
+            <div><h2>Recent applications</h2><p>Your latest local demo records.</p></div>
+            <a href="applications.html">View all →</a>
+          </div>
+          <div class="dashboard-list" id="recentApplications"></div>
+        </article>
+
+        <article class="dashboard-panel">
+          <div class="dashboard-panel-heading">
+            <div><h2>Saved jobs</h2><p>Roles you want to revisit.</p></div>
+            <a href="jobs.html">Find jobs →</a>
+          </div>
+          <div class="dashboard-list" id="savedJobsList"></div>
+        </article>
+      </section>
+
+      <section class="dashboard-quick-links" aria-label="Quick links">
+        <h2>Quick links</h2>
+        <a href="jobs.html"><span>⌕</span><strong>Find Jobs</strong><small>Explore sample opportunities</small></a>
+        <a href="profile.html"><span>◉</span><strong>My Profile</strong><small>Update your career details</small></a>
+        <a href="applications.html"><span>▤</span><strong>My Applications</strong><small>Review your local demo records</small></a>
+      </section>
+
+      <p class="dashboard-demo-note">
+        Demo only: this dashboard uses data stored in this browser. Applications are not sent to employers.
+      </p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <span>© <span id="currentYear"></span> JobPortal. Student project demo.</span>
+      <a href="index.html">Return to home →</a>
+    </div>
+  </footer>
+</body>
+</html>
