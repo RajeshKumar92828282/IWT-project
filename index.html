@@ -1,20 +1,21 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Discover career opportunities and find your next job with JobPortal.">
-  <title>JobPortal | Find Your Next Opportunity</title>
+  <meta name="description" content="Discover thousands of job opportunities with top companies. Build your dream career today with JobPortal.">
+  <title>JobPortal | Find Your Dream Job</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/responsive.css">
   <script src="js/session.js" defer></script>
+  <script src="js/xml-loader.js" defer></script>
   <script src="js/main.js" defer></script>
 </head>
 <body>
+  <!-- Header / Navigation -->
   <header class="site-header">
     <nav class="navbar container">
       <a href="index.html" class="brand">
@@ -46,153 +47,202 @@
   </header>
 
   <main>
+    <!-- Hero Section -->
     <section class="hero">
       <div class="container hero-grid">
         <div class="hero-content">
           <div class="eyebrow">
             <span class="status-dot"></span>
-            YOUR NEXT CHAPTER STARTS HERE
+            #1 JOB SEARCH PLATFORM
           </div>
 
-          <h1>Find work that<br> <span>moves you forward.</span></h1>
+          <h1>Find Your <br><span class="highlight">Dream Job</span></h1>
 
           <p class="hero-description">
-            Explore opportunities, connect with great companies, and take
-            the next step in your career with confidence.
+            Discover thousands of job opportunities with top companies. Build your career today.
           </p>
 
+          <!-- Search Form (JS dependent: #homeSearch, #homeKeyword, #homeLocation) -->
           <form class="search-panel" id="homeSearch">
-            <label class="search-field">
-              <span class="field-icon">⌕</span>
+            <label class="search-field" for="homeKeyword">
+              <span class="field-icon">🔍</span>
               <span class="search-input-wrap">
-                <span class="field-label">What are you looking for?</span>
-                <input type="text" id="homeKeyword" placeholder="Job title or keyword">
+                <span class="field-label">Job Title or Keyword</span>
+                <input type="text" id="homeKeyword" placeholder="Job title, skills or company">
               </span>
             </label>
 
             <span class="search-divider"></span>
 
-            <label class="search-field location-field">
-              <span class="field-icon">⌖</span>
+            <label class="search-field location-field" for="homeLocation">
+              <span class="field-icon">📍</span>
               <span class="search-input-wrap">
                 <span class="field-label">Location</span>
-                <input type="text" id="homeLocation" placeholder="City or remote">
+                <input type="text" id="homeLocation" placeholder="Location or remote">
               </span>
             </label>
 
-            <button class="btn btn-primary search-button" type="submit">Search jobs <span>→</span></button>
+            <span class="search-divider"></span>
+
+            <label class="search-field category-field">
+              <span class="field-icon">💼</span>
+              <span class="search-input-wrap">
+                <span class="field-label">Category</span>
+                <select class="search-category-select" aria-label="Select job category">
+                  <option value="">All Categories</option>
+                  <option value="Technology">IT &amp; Software</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Education">Education</option>
+                </select>
+              </span>
+            </label>
+
+            <button class="btn btn-primary search-button" type="submit">Search</button>
           </form>
 
-          <p class="popular-searches">
-            <strong>Popular:</strong>
-            <a href="jobs.html?keyword=Developer">Developer</a>
-            <a href="jobs.html?keyword=Designer">Designer</a>
-            <a href="jobs.html?keyword=Internship">Internship</a>
-          </p>
+          <!-- Popular Searches -->
+          <div class="popular-searches">
+            <strong>Popular Searches:</strong>
+            <a class="popular-tag" href="jobs.html?keyword=Software+Developer">Software Developer</a>
+            <a class="popular-tag" href="jobs.html?keyword=Data+Analyst">Data Analyst</a>
+            <a class="popular-tag" href="jobs.html?keyword=Web+Designer">Web Designer</a>
+            <a class="popular-tag" href="jobs.html?keyword=HR">HR</a>
+            <a class="popular-tag" href="jobs.html?keyword=Marketing">Marketing</a>
+          </div>
         </div>
 
+        <!-- Hero Visual Matching Reference -->
         <div class="hero-visual">
-          <div class="visual-orb orb-one"></div>
-          <div class="visual-orb orb-two"></div>
+          <div class="hero-art-backdrop"></div>
 
-          <div class="floating-card opportunity-card">
-            <div class="floating-icon">✦</div>
-            <div>
-              <strong>Your next opportunity</strong>
-              <p>Could be one click away.</p>
+          <div class="floating-pill pill-top">
+            <span class="pill-icon green">✓</span>
+            <div class="pill-text">
+              <strong>5,000+ Companies</strong>
+              <small>Verified Active Recruiters</small>
             </div>
           </div>
 
-          <div class="visual-main-card">
-            <div class="visual-topline">
-              <span class="visual-tag">CAREER SPOTLIGHT</span>
-              <span class="visual-dots">•••</span>
-            </div>
-            <div class="visual-avatar">JD</div>
-            <h3>Make your next move.</h3>
-            <p>Find roles that match your skills and ambitions.</p>
-            <div class="visual-progress">
-              <span></span>
-            </div>
-            <div class="visual-bottom">
-              <span>Explore opportunities</span>
-              <span class="arrow-circle">↗</span>
+          <div class="hero-art-card">
+            <div class="hero-avatar-large">👩‍💼</div>
+            <h3>Discover Your Next Role</h3>
+            <p>Connect with leading tech &amp; business firms worldwide.</p>
+            <div class="hero-art-badges">
+              <span class="hero-art-badge">⭐ 4.9/5 Rating</span>
+              <span class="hero-art-badge">⚡ Instant Apply</span>
             </div>
           </div>
 
-          <div class="floating-card match-card">
-            <span class="match-check">✓</span>
-            <div>
-              <strong>Better career matches</strong>
-              <p>Find your kind of work</p>
+          <div class="floating-pill pill-bottom">
+            <span class="pill-icon purple">💼</span>
+            <div class="pill-text">
+              <strong>25,000+ Jobs</strong>
+              <small>Live verified vacancies</small>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="trust-section">
-      <div class="container trust-inner">
-        <p>YOUR CAREER JOURNEY STARTS WITH GREAT COMPANIES</p>
-        <div class="trust-names">
-          <span>◈ Google</span>
-          <span>◉ Microsoft</span>
-          <span>✳ Amazon</span>
-          <span>⬡ Adobe</span>
-          <span>◒ Spotify</span>
+    <!-- Statistics Section Matching Reference -->
+    <section class="stats-section">
+      <div class="container stats-grid">
+        <div class="stat-item">
+          <div class="stat-icon">💼</div>
+          <div class="stat-info">
+            <strong>25,000+</strong>
+            <span>Job Openings</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">🏢</div>
+          <div class="stat-info">
+            <strong>5,000+</strong>
+            <span>Companies</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <strong>1M+</strong>
+            <span>Job Seekers</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <strong>98%</strong>
+            <span>Success Rate</span>
+          </div>
         </div>
       </div>
     </section>
 
+    <!-- Job Categories ("Browse Jobs by Category") -->
     <section class="section container">
       <div class="section-heading">
         <div>
-          <span class="section-kicker">EXPLORE POSSIBILITIES</span>
-          <h2>Find your perfect role.</h2>
-          <p>Start with a category that fits your ambition.</p>
+          <span class="section-kicker">BROWSE BY INDUSTRY</span>
+          <h2>Browse Jobs by Category</h2>
+          <p>Explore opportunities tailored to your professional specialization</p>
         </div>
         <a class="text-link" href="jobs.html">Explore all jobs <span>→</span></a>
       </div>
 
       <div class="category-grid">
         <a class="category-card" href="jobs.html?category=Technology">
-          <span class="category-icon icon-blue">⌘</span>
-          <h3>Technology</h3>
-          <p>Software, IT & more</p>
-          <span class="category-arrow">↗</span>
+          <span class="category-icon icon-purple">💻</span>
+          <h3>IT &amp; Software</h3>
+          <p>3,200+ Jobs</p>
         </a>
-        <a class="category-card" href="jobs.html?category=Design">
-          <span class="category-icon icon-purple">✳</span>
-          <h3>Design</h3>
-          <p>UI/UX & creative roles</p>
-          <span class="category-arrow">↗</span>
-        </a>
+
         <a class="category-card" href="jobs.html?category=Marketing">
-          <span class="category-icon icon-orange">↗</span>
+          <span class="category-icon icon-orange">📈</span>
           <h3>Marketing</h3>
-          <p>Growth & communication</p>
-          <span class="category-arrow">↗</span>
+          <p>1,050+ Jobs</p>
         </a>
+
         <a class="category-card" href="jobs.html?category=Business">
-          <span class="category-icon icon-green">▥</span>
-          <h3>Business</h3>
-          <p>Operations & management</p>
-          <span class="category-arrow">↗</span>
+          <span class="category-icon icon-green">💳</span>
+          <h3>Finance</h3>
+          <p>980+ Jobs</p>
+        </a>
+
+        <a class="category-card" href="jobs.html?category=Healthcare">
+          <span class="category-icon icon-red">🏥</span>
+          <h3>Healthcare</h3>
+          <p>720+ Jobs</p>
+        </a>
+
+        <a class="category-card" href="jobs.html?category=Education">
+          <span class="category-icon icon-blue">🎓</span>
+          <h3>Education</h3>
+          <p>640+ Jobs</p>
+        </a>
+
+        <a class="category-card" href="jobs.html">
+          <span class="category-icon icon-teal">➕</span>
+          <h3>More</h3>
+          <p>View All →</p>
         </a>
       </div>
     </section>
 
+    <!-- Featured Jobs Section -->
     <section class="featured-section">
       <div class="container section">
         <div class="section-heading">
           <div>
-            <span class="section-kicker">CURATED FOR YOU</span>
-            <h2>Featured opportunities.</h2>
-            <p>Explore sample openings across popular career paths.</p>
+            <span class="section-kicker">HAND-PICKED FOR YOU</span>
+            <h2>Featured Jobs</h2>
+            <p>Explore curated openings across high-growth career tracks.</p>
           </div>
-          <a class="text-link" href="jobs.html">View all jobs <span>→</span></a>
+          <a class="text-link" href="jobs.html">View All Jobs &rarr;</a>
         </div>
 
+        <!-- Featured Jobs Container (JS populates from XML, with clean fallback cards) -->
         <div class="job-grid" id="featuredJobs">
           <article class="job-card">
             <div class="job-card-top">
@@ -203,7 +253,7 @@
             <p class="company-name">Google · Bengaluru</p>
             <div class="job-tags"><span>React</span><span>JavaScript</span></div>
             <div class="job-card-bottom">
-              <div><strong>₹8–14 LPA</strong><small>Sample salary</small></div>
+              <div><strong>₹8–14 LPA</strong><small>Sample compensation</small></div>
               <a href="job-details.html?id=frontend" class="apply-arrow" aria-label="View Frontend Developer job">↗</a>
             </div>
           </article>
@@ -217,14 +267,14 @@
             <p class="company-name">Design Studio · Remote</p>
             <div class="job-tags"><span>Figma</span><span>UI/UX</span></div>
             <div class="job-card-bottom">
-              <div><strong>₹6–10 LPA</strong><small>Sample salary</small></div>
+              <div><strong>₹6–10 LPA</strong><small>Sample compensation</small></div>
               <a href="job-details.html?id=designer" class="apply-arrow" aria-label="View UI/UX Designer job">↗</a>
             </div>
           </article>
 
           <article class="job-card">
             <div class="job-card-top">
-              <div class="company-logo logo-amazon">a</div>
+              <div class="company-logo logo-amazon">A</div>
               <span class="job-type job-type-intern">Internship</span>
             </div>
             <h3>Software Engineer Intern</h3>
@@ -236,44 +286,63 @@
             </div>
           </article>
         </div>
-        <p class="demo-note">Demo listings for this student project. Employers, salaries and vacancies are illustrative.</p>
+
+        <p class="demo-note">Illustrative listings for demo. Employers, salaries and vacancies are indicative.</p>
       </div>
     </section>
 
+    <!-- Trust Companies Section -->
+    <section class="trust-section">
+      <div class="container trust-inner">
+        <p>TRUSTED BY LEADING TECH AND ENTERPRISE EMPLOYERS</p>
+        <div class="trust-names">
+          <span>◈ Google</span>
+          <span>◉ Microsoft</span>
+          <span>✳ Amazon</span>
+          <span>⬡ Adobe</span>
+          <span>◒ Spotify</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action Banner -->
     <section class="cta-section container">
       <div class="cta-panel">
         <div>
           <span class="section-kicker">YOUR FUTURE, YOUR MOVE</span>
-          <h2>Ready for what's next?</h2>
-          <p>Explore opportunities and take the first step toward your goals.</p>
+          <h2>Ready to Accelerate Your Career?</h2>
+          <p>Join over a million ambitious job seekers. Discover opportunities, polish your profile, and connect with top recruiters today.</p>
         </div>
         <a href="jobs.html" class="btn btn-white">Explore opportunities <span>→</span></a>
       </div>
     </section>
   </main>
 
+  <!-- Site Footer -->
   <footer class="site-footer">
     <div class="container footer-main">
       <div class="footer-brand">
         <a href="index.html" class="brand"><span class="brand-icon">J</span> JobPortal<span class="brand-dot">.</span></a>
-        <p>A simpler way to discover opportunities and build your future.</p>
+        <p>A simpler, faster way to discover opportunities, connect with top companies, and build a rewarding career.</p>
       </div>
       <div class="footer-column">
         <strong>Explore</strong>
         <a href="jobs.html">Find Jobs</a>
         <a href="companies.html">Companies</a>
         <a href="applications.html">My Applications</a>
+        <a href="dashboard.html">Saved Jobs</a>
       </div>
       <div class="footer-column">
-        <strong>Company</strong>
+        <strong>Company &amp; Access</strong>
         <a href="about.html">About Us</a>
-        <a href="contact.html">Contact</a>
-        <a href="login.html">Sign In</a>
+        <a href="contact.html">Contact Support</a>
+        <a href="login.html">Sign In / Register</a>
+        <a href="recruiter-dashboard.html">Recruiter Portal</a>
       </div>
     </div>
     <div class="container footer-bottom">
-      <span>© <span id="currentYear">2026</span> JobPortal. Student project demo.</span>
-      <span>Designed for your next opportunity.</span>
+      <span>© <span id="currentYear">2026</span> JobPortal. Web Technology project.</span>
+      <span>Empowering talent and great organizations everywhere.</span>
     </div>
   </footer>
 </body>

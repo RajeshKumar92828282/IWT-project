@@ -1,4 +1,3 @@
-
 "use strict";
 
 const APPLICATIONS_KEY = JOBPORTAL_KEYS.applications;
@@ -8,45 +7,7 @@ const applicationSearch = document.getElementById("applicationSearch");
 const statusFilter = document.getElementById("statusFilter");
 const applicationNotice = document.getElementById("applicationNotice");
 
-const jobCatalog = {
-  frontend: {
-    title: "Frontend Developer",
-    company: "Google"
-  },
-  designer: {
-    title: "UI/UX Designer",
-    company: "Design Studio"
-  },
-  intern: {
-    title: "Software Engineer Intern",
-    company: "Amazon"
-  },
-  marketing: {
-    title: "Digital Marketing Associate",
-    company: "Growth Labs"
-  },
-  business: {
-    title: "Business Operations Intern",
-    company: "NextStep"
-  },
-  backend: {
-    title: "Junior Backend Developer",
-    company: "CloudWorks"
-  },
-  content: {
-    title: "Content Design Intern",
-    company: "Creative House"
-  },
-  analyst: {
-    title: "Business Analyst",
-    company: "BrightPath"
-  }
-};
-
-function getAllApplications() {
-  const records = jobPortalReadJSON(APPLICATIONS_KEY, []);
-  return Array.isArray(records) ? records : [];
-}
+let candidateApplicationsCache = [];
 
 function getSavedJobs() {
   return jobPortalGetSavedJobs();
@@ -54,11 +15,6 @@ function getSavedJobs() {
 
 function getSession() {
   return jobPortalGetSession();
-}
-
-function getVisibleApplications() {
-  const session = getSession();
-  return session ? jobPortalGetUserApplications(session) : [];
 }
 
 function escapeHTML(value) {
@@ -70,21 +26,14 @@ function escapeHTML(value) {
       '"': "&quot;",
       "'": "&#39;"
     };
-
     return entities[character];
   });
 }
 
 function formatDate(dateString) {
-  if (!dateString) {
-    return "Date not available";
-  }
-
+  if (!dateString) return "Date not available";
   const date = new Date(dateString);
-
-  if (Number.isNaN(date.getTime())) {
-    return "Date not available";
-  }
+  if (Number.isNaN(date.getTime())) return "Date not available";
 
   return date.toLocaleDateString("en-IN", {
     day: "numeric",
@@ -98,19 +47,25 @@ function getApplicationStatus(application) {
     "Applied",
     "Under Review",
     "Shortlisted",
-    "Rejected"
+    "Interview",
+    "Hired",
+    "Rejected",
+    "Pending"
   ];
 
   return allowedStatuses.includes(application.status)
     ? application.status
-    : "Applied";
+    : "Pending";
 }
 
 function getStatusClass(status) {
   const statusClasses = {
     "Applied": "applied",
+    "Pending": "pending",
     "Under Review": "under-review",
     "Shortlisted": "shortlisted",
+    "Interview": "shortlisted",
+    "Hired": "hired",
     "Rejected": "rejected"
   };
 
@@ -118,6 +73,7 @@ function getStatusClass(status) {
 }
 
 function showNotice(message, type = "success") {
+  if (!applicationNotice) return;
   applicationNotice.textContent = message;
   applicationNotice.className = "application-notice visible";
 
@@ -129,92 +85,83 @@ function showNotice(message, type = "success") {
 function showSuccessFromURL() {
   const params = new URLSearchParams(window.location.search);
   const successId = params.get("success");
+  if (!successId) return;
 
-  if (!successId) {
-    return;
-  }
-
-  const exists = getVisibleApplications().some((application) => {
-    return application.id === successId;
-  });
-
-  if (exists) {
-    showNotice(
-      "Your demo application was saved successfully in this browser. " +
-      "This is not a real submission to an employer."
-    );
-  } else {
-    showNotice(
-      "The application reference could not be found in this browser. " +
-      "Check whether browser data was cleared.",
-      "error"
-    );
-  }
-
-  // Remove the success parameter so refreshing the page does not
-  // repeatedly show the submission message.
-  window.history.replaceState(
-    {},
-    document.title,
-    window.location.pathname
+  showNotice(
+    "Your application was saved to the database successfully! Recruiters can now review your profile and update your hiring status in real time."
   );
+
+  window.history.replaceState({}, document.title, window.location.pathname);
 }
 
 function updateStatistics(applications) {
-  const inProgress = applications.filter((application) => {
+  const inProgress = applications.filter(application => {
     const status = getApplicationStatus(application);
-    return status === "Applied" || status === "Under Review";
+    return status === "Applied" || status === "Under Review" || status === "Pending" || status === "Interview";
   }).length;
 
-  document.getElementById("totalApplications").textContent =
-    applications.length;
+  const totalEl = document.getElementById("totalApplications");
+  if (totalEl) totalEl.textContent = applications.length;
 
-  document.getElementById("activeApplications").textContent =
-    inProgress;
+  const activeEl = document.getElementById("activeApplications");
+  if (activeEl) activeEl.textContent = inProgress;
 
-  document.getElementById("savedJobsCount").textContent =
-    getSavedJobs().length;
+  const savedEl = document.getElementById("savedJobsCount");
+  if (savedEl) savedEl.textContent = getSavedJobs().length;
 
-  document.getElementById("applicationCountText").textContent =
-    applications.length === 1
-      ? "1 application saved in this browser"
-      : `${applications.length} applications saved in this browser`;
+  const countTextEl = document.getElementById("applicationCountText");
+  if (countTextEl) {
+    countTextEl.textContent = applications.length === 1
+      ? "1 application tracked in database"
+      : `${applications.length} applications tracked in database`;
+  }
 }
 
 function renderEmptyState(message, description) {
+  if (!applicationList) return;
   applicationList.innerHTML = `
-    <div class="applications-empty">
-      <div class="applications-empty-icon" aria-hidden="true">▤</div>
-      <h3>${escapeHTML(message)}</h3>
-      <p>${escapeHTML(description)}</p>
-      <a href="jobs.html">Explore available demo jobs &rarr;</a>
+    <div class="applications-empty" style="text-align: center; padding: 48px 20px; background: #FFFFFF; border-radius: 14px; border: 1.5px dashed #E5E7F0;">
+      <div class="applications-empty-icon" aria-hidden="true" style="font-size: 36px; margin-bottom: 10px;">📋</div>
+      <h3 style="font-size: 17px; font-weight: 700; color: #10152E; margin-bottom: 6px;">${escapeHTML(message)}</h3>
+      <p style="font-size: 13.5px; color: #6B7280; margin-bottom: 16px;">${escapeHTML(description)}</p>
+      <a href="jobs.html" class="btn btn-primary" style="font-size: 13px;">Explore Available Jobs →</a>
     </div>
   `;
 }
 
 function renderApplicationCard(application) {
   const status = getApplicationStatus(application);
-  const catalogJob = jobCatalog[application.jobId] || {};
+  const title = application.job_title || application.jobTitle || "Job Position";
+  const company = application.company || application.job_company || "Company";
+  const location = application.location || application.job_location || "Location not set";
+  const submittedAt = formatDate(application.submitted_at || application.submittedAt);
+  const resumeName = application.resume_name || application.resumeName || "Resume.pdf";
+  const reference = application.id || "APP-REF";
+  const jobId = application.job_id || application.jobId || "frontend";
 
-  const title = application.jobTitle || catalogJob.title || "Job position";
-  const company = application.company || catalogJob.company || "Company";
-  const location = application.location || "Location not provided";
-  const resumeName = application.resumeName || "No filename recorded";
-  const submittedAt = formatDate(application.submittedAt);
-  const reference = application.id || "Local demo record";
-  const jobId = application.jobId || "";
+  let statusNoteHtml = "";
+  if (Array.isArray(application.status_history) && application.status_history.length > 0) {
+    const latestHistory = application.status_history[application.status_history.length - 1];
+    if (latestHistory && latestHistory.note) {
+      statusNoteHtml = `
+        <div style="margin-top: 10px; padding: 10px 14px; background: #F8F8FC; border-radius: 6px; font-size: 12.5px; color: #4B5563; border-left: 3px solid #4F20E8;">
+          <strong>Latest update:</strong> ${escapeHTML(latestHistory.note)}
+        </div>
+      `;
+    }
+  }
 
   return `
-    <article class="application-card">
-      <div class="application-card-top">
-        <div class="application-job">
-          <div class="application-company-icon" aria-hidden="true">
+    <article class="application-card" style="padding: 22px; background: #FFFFFF; border: 1px solid #E5E7F0; border-radius: 14px; margin-bottom: 16px;">
+      <div class="application-card-top" style="display: flex; align-items: center; justify-content: space-between; gap: 14px;">
+        <div class="application-job" style="display: flex; align-items: center; gap: 14px;">
+          <div class="application-company-icon" aria-hidden="true" style="width: 44px; height: 44px; border-radius: 10px; background: #4F20E8; color: white; display: grid; place-items: center; font-size: 18px; font-weight: 800;">
             ${escapeHTML(company.trim().charAt(0).toUpperCase() || "J")}
           </div>
 
           <div>
-            <h3>${escapeHTML(title)}</h3>
-            <p class="application-company">${escapeHTML(company)}</p>
+            <h3 style="font-size: 17px; font-weight: 700; color: #10152E; margin: 0;">${escapeHTML(title)}</h3>
+            <p class="application-company" style="font-size: 13.5px; color: #6B7280; margin: 2px 0 0;">${escapeHTML(company)}</p>
           </div>
         </div>
 
@@ -223,28 +170,23 @@ function renderApplicationCard(application) {
         </span>
       </div>
 
-      <div class="application-meta">
-        <span>Location: ${escapeHTML(location)}</span>
-        <span>Submitted: ${escapeHTML(submittedAt)}</span>
-        <span>Resume: ${escapeHTML(resumeName)}</span>
+      <div class="application-meta" style="margin-top: 14px; display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: #6B7280;">
+        <span>📍 ${escapeHTML(location)}</span>
+        <span>📅 Submitted: ${escapeHTML(submittedAt)}</span>
+        <span>📎 Resume: ${escapeHTML(resumeName)}</span>
       </div>
 
-      <div class="application-card-footer">
-        <span class="application-reference">
-          Reference: ${escapeHTML(reference)}
+      ${statusNoteHtml}
+
+      <div class="application-card-footer" style="margin-top: 16px; padding-top: 14px; border-top: 1px solid #F1F3F9; display: flex; align-items: center; justify-content: space-between;">
+        <span class="application-reference" style="font-size: 12px; color: #9CA3AF;">
+          Ref ID: <strong style="color: #10152E;">${escapeHTML(reference)}</strong>
         </span>
 
-        <div class="application-actions">
-          <a href="job-details.html?id=${encodeURIComponent(jobId)}">
-            View Job
+        <div class="application-actions" style="display: flex; gap: 10px; align-items: center;">
+          <a href="job-details.html?id=${encodeURIComponent(jobId)}" class="btn btn-outline" style="font-size: 12.5px; padding: 6px 14px;">
+            View Job Details
           </a>
-          <button
-            type="button"
-            class="withdraw-application"
-            data-application-id="${escapeHTML(application.id || "")}"
-            aria-label="Withdraw application for ${escapeHTML(title)}">
-            Withdraw
-          </button>
         </div>
       </div>
     </article>
@@ -252,17 +194,18 @@ function renderApplicationCard(application) {
 }
 
 function renderApplications() {
-  const applications = getVisibleApplications();
+  if (!applicationList) return;
+  const applications = candidateApplicationsCache;
 
   updateStatistics(applications);
 
-  const searchTerm = applicationSearch.value.trim().toLowerCase();
-  const selectedStatus = statusFilter.value;
+  const searchTerm = applicationSearch ? applicationSearch.value.trim().toLowerCase() : "";
+  const selectedStatus = statusFilter ? statusFilter.value : "all";
 
   const filteredApplications = applications
     .filter((application) => {
-      const title = String(application.jobTitle || "").toLowerCase();
-      const company = String(application.company || "").toLowerCase();
+      const title = String(application.job_title || application.jobTitle || "").toLowerCase();
+      const company = String(application.company || application.job_company || "").toLowerCase();
 
       const matchesSearch =
         title.includes(searchTerm) || company.includes(searchTerm);
@@ -274,16 +217,15 @@ function renderApplications() {
       return matchesSearch && matchesStatus;
     })
     .sort((first, second) => {
-      const firstDate = new Date(first.submittedAt || 0).getTime() || 0;
-      const secondDate = new Date(second.submittedAt || 0).getTime() || 0;
-
+      const firstDate = new Date(first.submitted_at || first.submittedAt || 0).getTime() || 0;
+      const secondDate = new Date(second.submitted_at || second.submittedAt || 0).getTime() || 0;
       return secondDate - firstDate;
     });
 
   if (applications.length === 0) {
     renderEmptyState(
-      "No applications yet",
-      "When you apply for a demo job, your application record will appear here."
+      "No applications submitted yet",
+      "When you apply for a job opportunity, your application and live recruiter status updates will appear here."
     );
     return;
   }
@@ -291,7 +233,7 @@ function renderApplications() {
   if (filteredApplications.length === 0) {
     renderEmptyState(
       "No matching applications",
-      "Try another search term or select a different status filter."
+      "Try another search term or clear the status filter to see all your applications."
     );
     return;
   }
@@ -301,66 +243,33 @@ function renderApplications() {
     .join("");
 }
 
-function withdrawApplication(applicationId) {
-  if (!applicationId) {
-    showNotice("This record has no application ID and cannot be removed.", "error");
-    return;
+// Fetch applications from MySQL backend
+async function loadCandidateApplications() {
+  const session = getSession();
+  if (!session) return;
+
+  try {
+    const res = await jobPortalApiFetch("/api/candidate/applications");
+    if (res.ok && res.data && Array.isArray(res.data.applications)) {
+      candidateApplicationsCache = res.data.applications;
+    } else {
+      candidateApplicationsCache = jobPortalGetUserApplications(session);
+    }
+  } catch (e) {
+    candidateApplicationsCache = jobPortalGetUserApplications(session);
   }
 
-  const confirmed = window.confirm(
-    "Remove this application from your local demo history? " +
-    "This action cannot be undone."
-  );
-
-  if (!confirmed) {
-    return;
-  }
-
-  const user = getSession();
-  if (!user) {
-    jobPortalRequireLogin("applications.html");
-    return;
-  }
-  getVisibleApplications();
-  const allApplications = getAllApplications();
-  const updatedApplications = allApplications.filter(application =>
-    !(application && application.userId === user.id &&
-      application.id === applicationId)
-  );
-
-  if (updatedApplications.length === allApplications.length) {
-    showNotice("Application not found in local browser storage.", "error");
-    return;
-  }
-
-  if (!jobPortalWriteJSON(APPLICATIONS_KEY, updatedApplications)) {
-    showNotice("Unable to remove the application from browser storage.", "error");
-    return;
-  }
-
-  showNotice("Application removed from your local demo history.");
   renderApplications();
 }
 
-applicationSearch.addEventListener("input", renderApplications);
-statusFilter.addEventListener("change", renderApplications);
+if (applicationSearch) applicationSearch.addEventListener("input", renderApplications);
+if (statusFilter) statusFilter.addEventListener("change", renderApplications);
 
-applicationList.addEventListener("click", (event) => {
-  const button = event.target.closest(".withdraw-application");
-
-  if (!button) {
-    return;
-  }
-
-  withdrawApplication(button.dataset.applicationId);
-});
-
-// Update the footer year if the shared script has not already done so.
+// Update the footer year if not already set
 const yearElement = document.getElementById("currentYear");
-
 if (yearElement && !yearElement.textContent.trim()) {
   yearElement.textContent = new Date().getFullYear();
 }
 
 showSuccessFromURL();
-renderApplications();
+loadCandidateApplications();

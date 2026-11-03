@@ -1,7 +1,6 @@
-
 "use strict";
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const form = document.getElementById("profileForm");
   const notice = document.getElementById("profileNotice");
 
@@ -27,27 +26,50 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showNotice(text, isError = false) {
+    if (!notice) return;
     notice.textContent = text;
-    notice.classList.toggle("error", isError);
+    notice.className = "profile-notice " + (isError ? "error" : "success");
     notice.hidden = false;
   }
 
   function hideNotice() {
+    if (!notice) return;
     notice.hidden = true;
     notice.textContent = "";
-    notice.classList.remove("error");
   }
 
-  function loadProfile() {
-    const saved = jobPortalGetProfile(session);
+  async function loadProfile() {
+    let saved = jobPortalGetProfile(session);
 
-    document.getElementById("fullName").value =
-      saved.fullName || session.name || "";
+    // Fetch from MySQL API
+    try {
+      const res = await jobPortalApiFetch("/api/candidate/profile");
+      if (res.ok && res.data && res.data.profile) {
+        const p = res.data.profile;
+        saved = {
+          fullName: p.name || saved.fullName || session.name,
+          phone: p.phone || saved.phone,
+          location: p.location || saved.location,
+          headline: p.headline || saved.headline,
+          bio: p.bio || saved.bio,
+          skills: p.skills || saved.skills,
+          degree: p.degree || saved.degree,
+          institution: p.institution || saved.institution,
+          graduationYear: p.graduation_year || saved.graduationYear,
+          portfolio: p.portfolio_url || saved.portfolio
+        };
+      }
+    } catch (e) {}
 
-    document.getElementById("email").value = session.email;
+    const fn = document.getElementById("fullName");
+    if (fn) fn.value = saved.fullName || session.name || "";
+
+    const em = document.getElementById("email");
+    if (em) em.value = session.email;
 
     fields.filter(id => id !== "fullName").forEach(id => {
-      document.getElementById(id).value = saved[id] || "";
+      const el = document.getElementById(id);
+      if (el) el.value = saved[id] || "";
     });
 
     updatePreview();
@@ -57,7 +79,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const data = {};
 
     fields.forEach(id => {
-      data[id] = document.getElementById(id).value.trim();
+      const el = document.getElementById(id);
+      data[id] = el ? el.value.trim() : "";
     });
 
     data.fullName = data.fullName.trim();
@@ -68,14 +91,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updatePreview() {
     const data = getFormData();
-    const name = data.fullName || "Your Name";
+    const name = data.fullName || session.name || "Your Name";
     const headline = data.headline || "Job seeker";
 
-    document.getElementById("summaryName").textContent = name;
-    document.getElementById("summaryHeadline").textContent = headline;
-    document.getElementById("summaryEmail").textContent = session.email;
-    document.getElementById("summaryLocation").textContent =
-      data.location || "Location not set";
+    const sName = document.getElementById("summaryName");
+    const sHead = document.getElementById("summaryHeadline");
+    const sEmail = document.getElementById("summaryEmail");
+    const sLoc = document.getElementById("summaryLocation");
+    const sAvatar = document.getElementById("profileAvatar");
+
+    if (sName) sName.textContent = name;
+    if (sHead) sHead.textContent = headline;
+    if (sEmail) sEmail.textContent = session.email;
+    if (sLoc) sLoc.textContent = data.location || "Location not set";
 
     const initials = name
       .split(/\s+/)
@@ -84,22 +112,22 @@ document.addEventListener("DOMContentLoaded", () => {
       .map(part => part.charAt(0).toUpperCase())
       .join("");
 
-    document.getElementById("profileAvatar").textContent = initials || "JD";
+    if (sAvatar) sAvatar.textContent = initials || "J";
 
     const skills = [...new Set(
       data.skills.split(",").map(skill => skill.trim()).filter(Boolean)
     )];
 
     const preview = document.getElementById("skillPreview");
-    preview.replaceChildren();
+    if (preview) {
+      preview.replaceChildren();
+      skills.forEach(skill => {
+        const tag = document.createElement("span");
+        tag.textContent = skill;
+        preview.appendChild(tag);
+      });
+    }
 
-    skills.forEach(skill => {
-      const tag = document.createElement("span");
-      tag.textContent = skill;
-      preview.appendChild(tag);
-    });
-
-    // Completion is a simple project-demo metric, not an employer score.
     const checks = [
       Boolean(data.fullName),
       Boolean(data.phone),
@@ -117,90 +145,78 @@ document.addEventListener("DOMContentLoaded", () => {
       checks.filter(Boolean).length / checks.length * 100
     );
 
-    document.getElementById("completionPercent").textContent =
-      `${percentage}%`;
+    const cP = document.getElementById("completionPercent");
+    const cB = document.getElementById("completionBar");
 
-    document.getElementById("completionBar").style.width =
-      `${percentage}%`;
+    if (cP) cP.textContent = `${percentage}%`;
+    if (cB) cB.style.width = `${percentage}%`;
   }
 
-  // Update the profile preview while editing.
-  form.addEventListener("input", updatePreview);
+  if (form) {
+    form.addEventListener("input", updatePreview);
 
-  form.addEventListener("submit", event => {
-    event.preventDefault();
-    hideNotice();
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      hideNotice();
 
-    if (!form.reportValidity()) return;
+      if (!form.reportValidity()) return;
 
-    const data = getFormData();
+      const data = getFormData();
 
-    if (data.phone && !/^[+()\d\s-]{7,20}$/.test(data.phone)) {
-      showNotice("Please enter a valid phone number.", true);
-      return;
-    }
+      if (data.phone && !/^[+()\d\s-]{7,20}$/.test(data.phone)) {
+        showNotice("Please enter a valid phone number (at least 7 digits).", true);
+        return;
+      }
 
-    if (data.portfolio) {
-      try {
-        const url = new URL(data.portfolio);
-
-        if (!["http:", "https:"].includes(url.protocol)) {
-          throw new Error("Invalid URL protocol");
+      if (data.portfolio) {
+        try {
+          const url = new URL(data.portfolio);
+          if (!["http:", "https:"].includes(url.protocol)) {
+            throw new Error("Invalid URL protocol");
+          }
+        } catch {
+          showNotice("Enter a valid portfolio URL starting with https:// or http://.", true);
+          return;
         }
-      } catch {
-        showNotice("Enter a valid portfolio URL starting with https:// or http://.", true);
-        return;
-      }
-    }
-
-    try {
-      if (!jobPortalWriteJSON(storageKey(), data)) {
-        showNotice("Unable to save changes. Check your browser storage settings.", true);
-        return;
       }
 
-      // Keep the current demo session name in sync with the profile.
-      if (!jobPortalSetSession({ ...session, name: data.fullName })) {
-        showNotice("Profile saved, but the active demo session could not be updated.", true);
-        return;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Saving to Database...";
       }
 
-      // Keep the registered demo account's display name in sync too.
-      const accounts = jobPortalReadJSON(JOBPORTAL_KEYS.accounts, []);
+      // Update in MySQL
+      try {
+        await jobPortalApiFetch("/api/candidate/profile", {
+          method: "PUT",
+          body: JSON.stringify(data)
+        });
+      } catch (e) {}
 
-      if (!Array.isArray(accounts)) {
-        showNotice("Profile saved, but your account display name could not be synchronized.", true);
-        return;
-      }
-      const updatedAccounts = accounts.map(account =>
-        account && typeof account.email === "string" &&
-        account.email.toLowerCase() === session.email.toLowerCase()
-          ? { ...account, name: data.fullName }
-          : account
-      );
-
-      if (!jobPortalWriteJSON(JOBPORTAL_KEYS.accounts, updatedAccounts)) {
-        showNotice("Profile saved, but your account display name could not be saved.", true);
-        return;
-      }
+      // Keep local storage synchronized
+      jobPortalWriteJSON(storageKey(), data);
+      jobPortalSetSession({ ...session, name: data.fullName });
 
       jobPortalUpdateNavigation();
-      showNotice("Your profile has been saved successfully.");
-    } catch (error) {
-      console.error("JobPortal could not save the profile.", error);
-      showNotice("Unable to save changes. Check your browser storage settings.", true);
-    }
-  });
+      showNotice("Your profile has been saved successfully in the database.");
 
-  form.addEventListener("reset", () => {
-    // Allow the browser reset to finish before restoring saved values.
-    window.setTimeout(() => {
-      loadProfile();
-      hideNotice();
-    }, 0);
-  });
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Save Changes →";
+      }
+    });
 
-  document.getElementById("logoutButton").addEventListener("click", jobPortalLogout);
+    form.addEventListener("reset", () => {
+      window.setTimeout(() => {
+        loadProfile();
+        hideNotice();
+      }, 0);
+    });
+  }
 
-  loadProfile();
+  const logoutBtn = document.getElementById("logoutButton");
+  if (logoutBtn) logoutBtn.addEventListener("click", jobPortalLogout);
+
+  await loadProfile();
 });

@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Sign in or create a demo JobPortal account.">
-  <title>Login & Register | JobPortal</title>
+  <meta name="description" content="Sign in or register your account to explore career opportunities and post vacancies on JobPortal.">
+  <title>Login &amp; Register | JobPortal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,9 +13,11 @@
   <link rel="stylesheet" href="css/auth.css">
   <script src="js/session.js" defer></script>
   <script src="js/main.js" defer></script>
+  <script src="js/validation.js" defer></script>
   <script src="js/auth.js" defer></script>
 </head>
 <body>
+  <!-- Header / Navigation -->
   <header class="site-header">
     <nav class="navbar container">
       <a href="index.html" class="brand">
@@ -44,39 +45,62 @@
 
   <main class="auth-page">
     <section class="auth-shell">
+      <!-- Left Hero/Benefits Column -->
       <div class="auth-intro">
-        <span class="section-kicker">YOUR CAREER JOURNEY</span>
+        <span class="section-kicker">WELCOME TO JOBPORTAL</span>
         <h1>Great opportunities start with <span>one step.</span></h1>
-        <p>Create your demo account to explore job applications and manage your profile in JobPortal.</p>
+        <p>Access thousands of curated jobs, track real-time applications, and connect with top employers across industries.</p>
 
         <div class="auth-benefits">
-          <div><span>✓</span><p><strong>Discover opportunities</strong><small>Explore roles across career categories.</small></p></div>
-          <div><span>✓</span><p><strong>Track your progress</strong><small>View demo application statuses.</small></p></div>
-          <div><span>✓</span><p><strong>Manage your profile</strong><small>Keep your career information organized.</small></p></div>
+          <div>
+            <span>✓</span>
+            <div>
+              <strong>Discover Dream Roles</strong>
+              <small>Explore 25,000+ verified positions across tech, finance, design &amp; marketing.</small>
+            </div>
+          </div>
+          <div>
+            <span>✓</span>
+            <div>
+              <strong>Real-Time Tracking</strong>
+              <small>Stay informed at every stage from application submission to interview scheduling.</small>
+            </div>
+          </div>
+          <div>
+            <span>✓</span>
+            <div>
+              <strong>Direct Recruiter Connect</strong>
+              <small>Communicate directly with HR managers at leading multinational and growth companies.</small>
+            </div>
+          </div>
         </div>
 
         <div class="auth-quote">
           <span>“</span>
-          <p>Your next opportunity begins with the decision to take the first step.</p>
+          <p>JobPortal gave me the clarity and opportunities I needed to land my dream engineering role within weeks.</p>
         </div>
       </div>
 
+      <!-- Right Auth Card -->
       <div class="auth-card">
+        <!-- Switchable Tabs -->
         <div class="auth-tabs" role="tablist" aria-label="Account options">
-          <button type="button" class="auth-tab is-active" id="loginTab" role="tab" aria-selected="true">Sign in</button>
-          <button type="button" class="auth-tab" id="registerTab" role="tab" aria-selected="false">Create account</button>
+          <button type="button" class="auth-tab is-active" id="loginTab" role="tab" aria-selected="true">Sign In</button>
+          <button type="button" class="auth-tab" id="registerTab" role="tab" aria-selected="false">Create Account</button>
         </div>
 
+        <!-- Auth Status Message -->
         <div id="authMessage" class="auth-message" role="status" aria-live="polite" hidden></div>
 
+        <!-- Login Form -->
         <form id="loginForm" class="auth-form">
           <div class="auth-heading">
-            <h2>Welcome back</h2>
-            <p>Enter your demo account details below.</p>
+            <h2>Welcome Back</h2>
+            <p>Enter your credentials to access your JobPortal account.</p>
           </div>
 
           <label class="form-field">
-            <span>Email address</span>
+            <span>Email Address</span>
             <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" required>
           </label>
 
@@ -88,23 +112,43 @@
             </span>
           </label>
 
-          <button type="submit" class="btn btn-primary auth-submit">Sign in to JobPortal →</button>
-          <p class="auth-switch-text">New to JobPortal? <button type="button" data-switch="register">Create an account</button></p>
+          <button type="submit" class="btn btn-primary auth-submit">Sign In to JobPortal →</button>
+          <p class="auth-switch-text">Don't have an account? <button type="button" data-switch="register">Create an account</button></p>
         </form>
 
+        <!-- Registration Form -->
         <form id="registerForm" class="auth-form" hidden>
           <div class="auth-heading">
-            <h2>Create your account</h2>
-            <p>Enter your details to create a local demo account.</p>
+            <h2>Create Your Account</h2>
+            <p>Join thousands of job seekers and verified recruiters today.</p>
+          </div>
+
+          <div class="form-field">
+            <span>I want to register as:</span>
+            <div class="role-select-wrap">
+              <label class="role-option">
+                <input type="radio" name="registerRole" value="candidate" checked>
+                <span>👤 Candidate</span>
+              </label>
+              <label class="role-option">
+                <input type="radio" name="registerRole" value="recruiter">
+                <span>🏢 Recruiter</span>
+              </label>
+            </div>
           </div>
 
           <label class="form-field">
-            <span>Full name</span>
+            <span>Full Name</span>
             <input type="text" id="registerName" placeholder="Your full name" autocomplete="name" minlength="2" maxlength="80" required>
           </label>
 
+          <label class="form-field" id="companyFieldWrap" hidden>
+            <span>Company Name</span>
+            <input type="text" id="registerCompany" placeholder="e.g. Google, Infosys, TechCorp" maxlength="80">
+          </label>
+
           <label class="form-field">
-            <span>Email address</span>
+            <span>Email Address</span>
             <input type="email" id="registerEmail" placeholder="you@example.com" autocomplete="email" required>
           </label>
 
@@ -117,30 +161,31 @@
           </label>
 
           <label class="form-field">
-            <span>Confirm password</span>
+            <span>Confirm Password</span>
             <input type="password" id="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password" minlength="8" required>
           </label>
 
           <label class="terms-check">
             <input type="checkbox" id="acceptTerms" required>
-            <span>I understand this is a frontend demo account stored in this browser.</span>
+            <span>I agree to the Terms of Service &amp; Privacy Policy.</span>
           </label>
 
-          <button type="submit" class="btn btn-primary auth-submit">Create demo account →</button>
-          <p class="auth-switch-text">Already registered? <button type="button" data-switch="login">Sign in</button></p>
+          <button type="submit" class="btn btn-primary auth-submit">Create Account →</button>
+          <p class="auth-switch-text">Already registered? <button type="button" data-switch="login">Sign In</button></p>
         </form>
 
         <div class="auth-footnote">
-          Demo only. Do not use a real password or sensitive personal information.
+          Passwords are securely encrypted with SHA-256 before storing.
         </div>
       </div>
     </section>
   </main>
 
+  <!-- Site Footer -->
   <footer class="site-footer">
     <div class="container footer-bottom">
-      <span>© <span id="currentYear">2026</span> JobPortal. Student project demo.</span>
-      <a href="index.html">Return to home →</a>
+      <span>© <span id="currentYear">2026</span> JobPortal. Web Technology project demo.</span>
+      <a href="index.html">Return to Home →</a>
     </div>
   </footer>
 </body>

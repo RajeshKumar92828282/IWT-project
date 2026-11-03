@@ -10,16 +10,35 @@ document.addEventListener("DOMContentLoaded", () => {
     new URLSearchParams(window.location.search).get("returnTo")
   );
 
+  // Role radio buttons & company field
+  const roleRadios = document.querySelectorAll('input[name="registerRole"]');
+  const companyFieldWrap = document.getElementById("companyFieldWrap");
+  const registerCompany = document.getElementById("registerCompany");
+
+  if (roleRadios && companyFieldWrap) {
+    roleRadios.forEach(radio => {
+      radio.addEventListener("change", () => {
+        const isRecruiter = radio.value === "recruiter";
+        companyFieldWrap.hidden = !isRecruiter;
+        if (registerCompany) {
+          registerCompany.required = isRecruiter;
+        }
+      });
+    });
+  }
+
   function showMessage(text, isError = false) {
+    if (!message) return;
     message.textContent = text;
-    message.classList.toggle("error", isError);
+    message.className = "auth-message " + (isError ? "error" : "success");
     message.hidden = false;
   }
 
   function clearMessage() {
+    if (!message) return;
     message.textContent = "";
     message.hidden = true;
-    message.classList.remove("error");
+    message.className = "auth-message";
   }
 
   function switchTab(tab) {
@@ -33,8 +52,8 @@ document.addEventListener("DOMContentLoaded", () => {
     clearMessage();
   }
 
-  loginTab.addEventListener("click", () => switchTab("login"));
-  registerTab.addEventListener("click", () => switchTab("register"));
+  if (loginTab) loginTab.addEventListener("click", () => switchTab("login"));
+  if (registerTab) registerTab.addEventListener("click", () => switchTab("register"));
 
   document.querySelectorAll("[data-switch]").forEach(button => {
     button.addEventListener("click", () => switchTab(button.dataset.switch));
@@ -52,29 +71,62 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  function readAccounts() {
-    const accounts = jobPortalReadJSON(JOBPORTAL_KEYS.accounts, []);
-    return Array.isArray(accounts)
-      ? accounts.filter(account =>
-        account && typeof account.email === "string" &&
-        typeof account.passwordHash === "string"
-      )
-      : [];
-  }
+  // Login Handler (Real Backend API + LocalStorage Fallback)
+  loginForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    clearMessage();
+    if (!loginForm.reportValidity()) return;
 
-  async function hashPassword(password) {
-    if (!window.crypto || !window.crypto.subtle) {
-      throw new Error(
-        "Browser cryptography is unavailable. Open the project on localhost using Live Server."
-      );
+    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+    const password = document.getElementById("loginPassword").value;
+
+    showMessage("Authenticating with database...");
+
+    try {
+      const res = await jobPortalApiFetch("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password })
+      });
+
+      if (res.ok && res.data && res.data.success) {
+        const user = res.data.user;
+        jobPortalSetSession(user);
+
+        const targetDestination = user.role === "recruiter"
+          ? "recruiter-dashboard.html"
+          : (returnTo || "dashboard.html");
+
+        showMessage(`Welcome back, ${user.name}! Redirecting to dashboard...`);
+        window.setTimeout(() => {
+          window.location.assign(targetDestination);
+        }, 350);
+        return;
+      }
+
+      if (res.status === 401 || (res.data && res.data.message)) {
+        showMessage(res.data.message || "Invalid email or password.", true);
+        return;
+      }
+
+      // Offline / LocalStorage fallback
+      const accounts = jobPortalReadJSON(JOBPORTAL_KEYS.accounts, []);
+      const localAcc = accounts.find(a => a.email.toLowerCase() === email);
+      if (localAcc) {
+        jobPortalSetSession(localAcc);
+        const target = localAcc.role === "recruiter" ? "recruiter-dashboard.html" : (returnTo || "dashboard.html");
+        showMessage(`Welcome back, ${localAcc.name}! Redirecting...`);
+        window.setTimeout(() => window.location.assign(target), 350);
+        return;
+      }
+
+      showMessage("Invalid email or password.", true);
+    } catch (err) {
+      console.error("Login error:", err);
+      showMessage("Unable to connect to login service. Please try again.", true);
     }
-    const bytes = new TextEncoder().encode(password);
-    const digest = await window.crypto.subtle.digest("SHA-256", bytes);
-    return Array.from(new Uint8Array(digest))
-      .map(byte => byte.toString(16).padStart(2, "0"))
-      .join("");
-  }
+  });
 
+  // Registration Handler (Real Backend API + MySQL Insertion)
   registerForm.addEventListener("submit", async event => {
     event.preventDefault();
     clearMessage();
@@ -86,12 +138,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const confirmPassword = document.getElementById("confirmPassword").value;
     const accepted = document.getElementById("acceptTerms").checked;
 
+    const selectedRoleInput = document.querySelector('input[name="registerRole"]:checked');
+    const role = selectedRoleInput ? selectedRoleInput.value : "candidate";
+    const company = role === "recruiter"
+      ? (document.getElementById("registerCompany").value.trim() || "Independent")
+      : "";
+
     if (name.length < 2) {
-      showMessage("Please enter your full name.", true);
+      showMessage("Please enter your full name (at least 2 characters).", true);
       return;
     }
-    if (password.length < 8) {
-      showMessage("Your demo password must contain at least 8 characters.", true);
+    if (password.length < 6) {
+      showMessage("Password must contain at least 6 characters.", true);
       return;
     }
     if (password !== confirmPassword) {
@@ -99,77 +157,47 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     if (!accepted) {
-      showMessage("Please confirm that you understand this is a demo account.", true);
+      showMessage("Please accept the Terms of Service to continue.", true);
       return;
     }
 
-    try {
-      const accounts = readAccounts();
-      if (accounts.some(account => account.email.trim().toLowerCase() === email)) {
-        showMessage("An account with this email already exists. Please sign in.", true);
-        return;
-      }
+    showMessage("Creating your account in database...");
 
-      accounts.push({
-        id: jobPortalUserId(email),
-        name,
-        email,
-        passwordHash: await hashPassword(password)
+    try {
+      const res = await jobPortalApiFetch("/api/auth/register", {
+        method: "POST",
+        body: JSON.stringify({ name, email, password, role, company })
       });
-      if (!jobPortalWriteJSON(JOBPORTAL_KEYS.accounts, accounts) ||
-          !jobPortalSetSession({ name, email })) {
-        showMessage("Unable to create your demo account in browser storage.", true);
+
+      if (res.ok && res.data && res.data.success) {
+        const user = res.data.user;
+        jobPortalSetSession(user);
+
+        // Also save to local accounts cache
+        const accounts = jobPortalReadArrayForUpdate(JOBPORTAL_KEYS.accounts);
+        accounts.push(user);
+        jobPortalWriteJSON(JOBPORTAL_KEYS.accounts, accounts);
+
+        const targetDestination = role === "recruiter"
+          ? "recruiter-dashboard.html"
+          : (returnTo || "dashboard.html");
+
+        showMessage(`Account registered successfully as ${role === "recruiter" ? "Recruiter" : "Candidate"}! Redirecting...`);
+        window.setTimeout(() => {
+          window.location.assign(targetDestination);
+        }, 400);
         return;
       }
 
-      showMessage("Demo account created. Opening your account...");
-      window.setTimeout(() => {
-        window.location.assign(returnTo || "dashboard.html");
-      }, 250);
-    } catch (error) {
-      console.error("JobPortal registration failed.", error);
-      showMessage(
-        error.message || "Unable to create your demo account in browser storage.",
-        true
-      );
-    }
-  });
-
-  loginForm.addEventListener("submit", async event => {
-    event.preventDefault();
-    clearMessage();
-    if (!loginForm.reportValidity()) return;
-
-    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
-    const password = document.getElementById("loginPassword").value;
-
-    try {
-      const account = readAccounts().find(item =>
-        item.email.trim().toLowerCase() === email
-      );
-      if (!account) {
-        showMessage("No demo account found. Create an account first.", true);
-        return;
-      }
-      if (account.passwordHash !== await hashPassword(password)) {
-        showMessage("Incorrect email or password.", true);
-        return;
-      }
-      if (!jobPortalSetSession({ id: account.id, name: account.name, email: account.email })) {
-        showMessage("Unable to start your demo session in browser storage.", true);
+      if (res.data && res.data.message) {
+        showMessage(res.data.message, true);
         return;
       }
 
-      showMessage("Signed in successfully. Returning to your page...");
-      window.setTimeout(() => {
-        window.location.assign(returnTo || "dashboard.html");
-      }, 250);
-    } catch (error) {
-      console.error("JobPortal sign-in failed.", error);
-      showMessage(
-        error.message || "Unable to sign in using browser storage.",
-        true
-      );
+      showMessage("Could not register account. Please check your details and try again.", true);
+    } catch (err) {
+      console.error("Registration error:", err);
+      showMessage("Registration request failed. Please try again.", true);
     }
   });
 
@@ -177,5 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (mode === "register") switchTab("register");
 
   const session = jobPortalGetSession();
-  if (session) document.getElementById("loginEmail").value = session.email;
+  if (session && document.getElementById("loginEmail")) {
+    document.getElementById("loginEmail").value = session.email;
+  }
 });

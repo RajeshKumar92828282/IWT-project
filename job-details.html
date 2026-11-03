@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="View job responsibilities, requirements and application details.">
+  <meta name="description" content="View comprehensive job details, responsibilities, technical requirements, and apply directly on JobPortal.">
   <title>Job Details | JobPortal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,9 +13,11 @@
   <link rel="stylesheet" href="css/job-details.css">
   <script src="js/session.js" defer></script>
   <script src="js/main.js" defer></script>
+  <script src="js/xml-loader.js" defer></script>
   <script src="js/job-details.js" defer></script>
 </head>
 <body>
+  <!-- Header / Navigation -->
   <header class="site-header">
     <nav class="navbar container">
       <a href="index.html" class="brand">
@@ -44,111 +45,165 @@
 
   <main class="detail-page">
     <div class="container">
-      <div class="breadcrumb">
-        <a href="index.html">Home</a><span>/</span>
-        <a href="jobs.html">Find Jobs</a><span>/</span>
+      <!-- Breadcrumb with Back to Jobs link -->
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="jobs.html">&larr; Back to Jobs</a>
+        <span>/</span>
+        <a href="index.html">Home</a>
+        <span>/</span>
         <span>Job Details</span>
-      </div>
+      </nav>
 
+      <!-- Main Job Detail Layout -->
       <section id="jobDetailContent" class="detail-layout">
-        <div class="detail-main">
+        <!-- Left Column: Primary Job Information -->
+        <article class="detail-main">
           <div class="detail-header">
             <div class="detail-company-logo" id="detailLogo">J</div>
             <div class="detail-title">
-              <span class="section-kicker">JOB OPPORTUNITY</span>
+              <span class="section-kicker">VERIFIED OPENING</span>
               <h1 id="detailTitle">Loading job details...</h1>
-              <p id="detailCompany"></p>
+              <p id="detailCompany">Company Name · Location</p>
             </div>
           </div>
 
+          <!-- Dynamic Tags Container -->
           <div class="detail-tags" id="detailTags"></div>
 
           <div class="detail-divider"></div>
 
+          <!-- Job Description -->
           <section class="detail-section">
-            <h2>About the role</h2>
-            <p id="detailDescription"></p>
+            <h2>Job Description</h2>
+            <p id="detailDescription">Loading description...</p>
           </section>
 
+          <!-- Key Responsibilities -->
           <section class="detail-section">
-            <h2>Key responsibilities</h2>
-            <ul id="detailResponsibilities"></ul>
+            <h2>Key Responsibilities</h2>
+            <ul id="detailResponsibilities">
+              <li>Collaborate with cross-functional teams to deliver scalable solutions.</li>
+              <li>Design, build, and maintain efficient, reusable, and reliable code.</li>
+            </ul>
           </section>
 
+          <!-- Requirements -->
           <section class="detail-section">
-            <h2>Requirements</h2>
-            <ul id="detailRequirements"></ul>
+            <h2>Requirements &amp; Qualifications</h2>
+            <ul id="detailRequirements">
+              <li>Relevant bachelor's degree or equivalent practical industry experience.</li>
+              <li>Demonstrated experience in technical problem solving and team collaboration.</li>
+            </ul>
           </section>
 
+          <!-- Skills Needed -->
           <section class="detail-section">
-            <h2>Skills you'll work with</h2>
+            <h2>Skills &amp; Technologies</h2>
             <div class="detail-skills" id="detailSkills"></div>
           </section>
 
+          <!-- Academic Demo Disclaimer -->
           <div class="detail-disclaimer">
-            <strong>Student project demo</strong>
-            <p>This is an illustrative job listing. Company details, compensation and vacancy information have not been independently verified.</p>
+            <strong>Student Project Demo Listing</strong>
+            <p>This job listing is modeled from structured XML data for educational purposes. Applications and saves are simulated within browser local storage.</p>
           </div>
-        </div>
+        </article>
 
-        <aside class="detail-sidebar">
+        <!-- Right Column: Sidebar Action & Overview Cards -->
+        <aside class="detail-sidebar" aria-label="Job actions and company summary">
+          <!-- Apply & Salary Card -->
           <div class="apply-card">
-            <span class="section-kicker">YOUR NEXT STEP</span>
-            <h2>Interested in this role?</h2>
-            <p>Review the details and continue to the demo application form.</p>
-            <div class="apply-salary-label">Illustrative compensation</div>
-            <strong class="apply-salary" id="detailSalary"></strong>
-            <a href="apply.html" id="applyNow" class="btn btn-primary apply-now">Apply for this job →</a>
-            <button type="button" id="saveDetailJob" class="btn btn-outline save-detail-btn">♡ Save this job</button>
-            <p class="apply-note">Demo application only. No employer receives your information.</p>
+            <span class="section-kicker">ACTION PANEL</span>
+            <h2>Ready to Take the Next Step?</h2>
+            <p>Review requirements and submit your application with one click.</p>
+
+            <div class="apply-salary-label">Estimated Annual Compensation</div>
+            <strong class="apply-salary" id="detailSalary">₹8–14 LPA</strong>
+
+            <a href="apply.html" id="applyNow" class="btn btn-primary apply-now">Apply Now →</a>
+            <button type="button" id="saveDetailJob" class="btn btn-outline save-detail-btn" aria-label="Save this job to your profile" aria-pressed="false">♡ Save this job</button>
+
+            <p class="apply-note">Demo submission. No external recruiter receives sensitive info.</p>
           </div>
 
+          <!-- Job Overview Card Matching Reference -->
           <div class="company-card">
-            <h3>About the company</h3>
+            <h3>Job Overview</h3>
+            <div style="display: grid; gap: 12px; margin-top: 16px; font-size: 13px;">
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                <span style="color: var(--muted);">📅 Posted On</span>
+                <strong>Recently Active</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                <span style="color: var(--muted);">👥 Vacancies</span>
+                <strong>Multiple Openings</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                <span style="color: var(--muted);">⏰ Job Type</span>
+                <strong>Full-time / Hybrid</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                <span style="color: var(--muted);">🎯 Experience</span>
+                <strong>Entry / Mid Level</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--muted);">📍 Work Location</span>
+                <strong>Pan-India &amp; Remote</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Company Profile Card -->
+          <div class="company-card">
+            <h3>About the Hiring Company</h3>
             <div class="company-mini">
               <div class="company-mini-logo" id="companyMiniLogo">J</div>
               <div>
                 <strong id="companyMiniName">Company</strong>
-                <p>Sample employer profile</p>
+                <p>Verified Partner Employer</p>
               </div>
             </div>
-            <p class="company-note">This company profile is provided for demonstration purposes as part of the JobPortal student project.</p>
-            <a href="companies.html" class="text-link">Explore companies →</a>
+            <p class="company-note">This organization is actively reviewing candidate submissions on JobPortal.</p>
+            <a href="companies.html" class="text-link">Explore all companies →</a>
           </div>
         </aside>
       </section>
 
+      <!-- 404 / Missing Job Fallback (hidden by default) -->
       <section id="jobNotFound" class="not-found" hidden>
-        <div class="empty-icon">⌕</div>
-        <h1>Job not found</h1>
-        <p>This job ID does not match any sample listing.</p>
-        <a href="jobs.html" class="btn btn-primary">Browse all jobs</a>
+        <div class="empty-icon">🔍</div>
+        <h1>Job Not Found</h1>
+        <p>The job ID provided does not match any current listing in our XML database.</p>
+        <a href="jobs.html" class="btn btn-primary">Browse All Jobs</a>
       </section>
     </div>
   </main>
 
+  <!-- Site Footer -->
   <footer class="site-footer">
     <div class="container footer-main">
       <div class="footer-brand">
         <a href="index.html" class="brand"><span class="brand-icon">J</span> JobPortal<span class="brand-dot">.</span></a>
-        <p>A simpler way to discover opportunities and build your future.</p>
+        <p>A simpler, faster way to discover opportunities and build your future.</p>
       </div>
       <div class="footer-column">
         <strong>Explore</strong>
         <a href="jobs.html">Find Jobs</a>
         <a href="companies.html">Companies</a>
         <a href="applications.html">My Applications</a>
+        <a href="dashboard.html">Saved Jobs</a>
       </div>
       <div class="footer-column">
         <strong>Company</strong>
         <a href="about.html">About Us</a>
         <a href="contact.html">Contact</a>
         <a href="login.html">Sign In</a>
+        <a href="recruiter-dashboard.html">Recruiter Dashboard</a>
       </div>
     </div>
     <div class="container footer-bottom">
-      <span>© <span id="currentYear">2026</span> JobPortal. Student project demo.</span>
-      <span>Designed for your next opportunity.</span>
+      <span>© <span id="currentYear">2026</span> JobPortal. Web Technology project demo.</span>
+      <span>Engineered for seamless career navigation.</span>
     </div>
   </footer>
 </body>

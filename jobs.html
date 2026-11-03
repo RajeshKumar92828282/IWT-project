@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Browse and filter job opportunities on JobPortal.">
+  <meta name="description" content="Search, filter, and discover curated job opportunities across top tech, business, and creative sectors on JobPortal.">
   <title>Find Jobs | JobPortal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,9 +13,11 @@
   <link rel="stylesheet" href="css/jobs.css">
   <script src="js/session.js" defer></script>
   <script src="js/main.js" defer></script>
+  <script src="js/xml-loader.js" defer></script>
   <script src="js/jobs.js" defer></script>
 </head>
 <body>
+  <!-- Header / Navigation -->
   <header class="site-header">
     <nav class="navbar container">
       <a href="index.html" class="brand">
@@ -46,43 +47,48 @@
   </header>
 
   <main>
+    <!-- Search Hero Section -->
     <section class="jobs-hero">
       <div class="container">
-        <span class="section-kicker">YOUR NEXT OPPORTUNITY</span>
-        <h1>Find a job that fits <span>your future.</span></h1>
-        <p>Explore sample openings, discover new roles, and find the right next step for your career.</p>
+        <span class="section-kicker">EXPLORE 25,000+ CAREER OPPORTUNITIES</span>
+        <h1>Find a Job that Fits <span>Your Future.</span></h1>
+        <p>Search by title, technology, location, or work model to discover verified openings at top companies.</p>
 
         <form id="jobsSearch" class="jobs-search">
-          <label class="jobs-search-field">
-            <span>⌕</span>
+          <label class="jobs-search-field" for="jobKeyword">
+            <span>🔍</span>
             <input type="search" id="jobKeyword" placeholder="Job title, skill or company">
           </label>
-          <label class="jobs-search-field">
-            <span>⌖</span>
-            <input type="text" id="jobLocation" placeholder="City or remote">
+          <label class="jobs-search-field" for="jobLocation">
+            <span>📍</span>
+            <input type="text" id="jobLocation" placeholder="City, state or remote">
           </label>
-          <button class="btn btn-primary" type="submit">Search jobs →</button>
+          <button class="btn btn-primary" type="submit">Search Jobs →</button>
         </form>
       </div>
     </section>
 
+    <!-- Jobs Main Content with Sidebar Filters -->
     <section class="container jobs-layout">
-      <aside class="filter-panel">
+      <!-- Filter Sidebar -->
+      <aside class="filter-panel" aria-label="Job filters">
         <div class="filter-heading">
           <h2>Filters</h2>
           <button type="button" id="resetFilters" class="reset-button">Reset all</button>
         </div>
 
         <div class="filter-group">
-          <h3>Job category</h3>
+          <h3>Job Category</h3>
           <label class="filter-option"><input type="checkbox" name="category" value="Technology"> Technology</label>
           <label class="filter-option"><input type="checkbox" name="category" value="Design"> Design</label>
           <label class="filter-option"><input type="checkbox" name="category" value="Marketing"> Marketing</label>
           <label class="filter-option"><input type="checkbox" name="category" value="Business"> Business</label>
+          <label class="filter-option"><input type="checkbox" name="category" value="Healthcare"> Healthcare</label>
+          <label class="filter-option"><input type="checkbox" name="category" value="Education"> Education</label>
         </div>
 
         <div class="filter-group">
-          <h3>Employment type</h3>
+          <h3>Employment Type</h3>
           <label class="filter-option"><input type="checkbox" name="type" value="Full-time"> Full-time</label>
           <label class="filter-option"><input type="checkbox" name="type" value="Part-time"> Part-time</label>
           <label class="filter-option"><input type="checkbox" name="type" value="Internship"> Internship</label>
@@ -90,67 +96,75 @@
         </div>
 
         <div class="filter-group">
-          <h3>Work arrangement</h3>
+          <h3>Work Arrangement</h3>
           <label class="filter-option"><input type="checkbox" name="work" value="On-site"> On-site</label>
           <label class="filter-option"><input type="checkbox" name="work" value="Hybrid"> Hybrid</label>
           <label class="filter-option"><input type="checkbox" name="work" value="Remote"> Remote</label>
         </div>
       </aside>
 
+      <!-- Results Area -->
       <section class="jobs-results">
         <div class="results-heading">
           <div>
-            <h2>Explore opportunities</h2>
+            <h2>Explore Opportunities</h2>
             <p id="resultsCount" aria-live="polite">Loading jobs...</p>
           </div>
 
           <label class="sort-control">
-            <span>Sort by</span>
-            <select id="sortJobs">
+            <span>Sort by:</span>
+            <select id="sortJobs" aria-label="Sort job results">
               <option value="recommended">Recommended</option>
-              <option value="title">Job title A–Z</option>
+              <option value="title">Job Title A–Z</option>
               <option value="company">Company A–Z</option>
             </select>
           </label>
         </div>
 
+        <!-- Filter Chips Container -->
         <div id="activeFilters" class="active-filters"></div>
+
+        <!-- Job Cards List (Rendered dynamically by jobs.js from XML) -->
         <div id="jobsList" class="jobs-list"></div>
 
+        <!-- Empty State -->
         <div id="emptyState" class="empty-state" hidden>
-          <div class="empty-icon">⌕</div>
+          <div class="empty-icon">🔍</div>
           <h3>No matching jobs found</h3>
-          <p>Try changing your keywords or removing some filters.</p>
-          <button type="button" id="emptyReset" class="btn btn-primary">Clear filters</button>
+          <p>We couldn't find openings matching your filter criteria. Try adjusting your keyword or clearing filters.</p>
+          <button type="button" id="emptyReset" class="btn btn-primary">Clear all filters</button>
         </div>
 
-        <p class="demo-note">These are illustrative listings created for a student project. They are not verified live vacancies.</p>
+        <p class="demo-note">Illustrative listings for student academic demo. XML-backed data model with client-side reactive filtering.</p>
       </section>
     </section>
   </main>
 
+  <!-- Site Footer -->
   <footer class="site-footer">
     <div class="container footer-main">
       <div class="footer-brand">
         <a href="index.html" class="brand"><span class="brand-icon">J</span> JobPortal<span class="brand-dot">.</span></a>
-        <p>A simpler way to discover opportunities and build your future.</p>
+        <p>A modern platform connecting ambitious talent with visionary companies worldwide.</p>
       </div>
       <div class="footer-column">
         <strong>Explore</strong>
         <a href="jobs.html">Find Jobs</a>
         <a href="companies.html">Companies</a>
         <a href="applications.html">My Applications</a>
+        <a href="dashboard.html">Saved Jobs</a>
       </div>
       <div class="footer-column">
-        <strong>Company</strong>
+        <strong>Platform</strong>
         <a href="about.html">About Us</a>
         <a href="contact.html">Contact</a>
         <a href="login.html">Sign In</a>
+        <a href="recruiter-dashboard.html">Recruiter Dashboard</a>
       </div>
     </div>
     <div class="container footer-bottom">
-      <span>© <span id="currentYear">2026</span> JobPortal. Student project demo.</span>
-      <span>Designed for your next opportunity.</span>
+      <span>© <span id="currentYear">2026</span> JobPortal. Web Technology project demo.</span>
+      <span>Engineered for seamless career navigation.</span>
     </div>
   </footer>
 </body>

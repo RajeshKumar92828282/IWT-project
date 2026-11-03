@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Recruiter Dashboard - Review candidates, verify submitted resumes, and manage applicant statuses.">
+  <title>Recruiter Dashboard | JobPortal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/recruiter.css">
+  <script src="js/session.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/xml-loader.js" defer></script>
+  <script src="js/recruiter.js" defer></script>
+  <style>
+    /* Dedicated Recruiter Dashboard Visual Enhancements matching reference design */
+    body {
+      background: #F8F8FC;
+      margin: 0;
+      color: var(--text);
+    }
+    .recruiter-portal-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+    /* Dark Navy Sidebar */
+    .portal-sidebar {
+      width: 260px;
+      background: #10152E;
+      color: #FFFFFF;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+    .sidebar-header {
+      padding: 24px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #FFFFFF;
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+    .sidebar-brand .brand-icon {
+      background: #4F20E8;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: #FFFFFF;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(79, 32, 232, 0.4);
+    }
+    .sidebar-nav {
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .sidebar-nav-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #6B7280;
+      font-weight: 700;
+      padding: 10px 12px 4px;
+    }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      color: #94A3B8;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    .sidebar-link:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #FFFFFF;
+    }
+    .sidebar-link.active {
+      background: #4F20E8;
+      color: #FFFFFF;
+      font-weight: 600;
+      box-shadow: 0 4px 14px rgba(79, 32, 232, 0.35);
+    }
+    .sidebar-link-icon {
+      font-size: 16px;
+      width: 20px;
+      display: inline-grid;
+      place-items: center;
+    }
+    .sidebar-footer {
+      padding: 18px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .sidebar-logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 14px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      color: #EF4444;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .sidebar-logout-btn:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: #EF4444;
+    }
+    /* Main Content Area */
+    .portal-main-wrapper {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: #F8F8FC;
+    }
+    /* Top Header */
+    .portal-topbar {
+      background: #FFFFFF;
+      border-bottom: 1px solid #E5E7F0;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 80;
+    }
+    .topbar-title-wrap h2 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #10152E;
+      margin: 0;
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .post-job-top-btn {
+      background: #4F20E8;
+      color: #FFFFFF;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: background 0.2s ease;
+      box-shadow: 0 4px 12px rgba(79, 32, 232, 0.25);
+    }
+    .post-job-top-btn:hover {
+      background: #3A17B8;
+    }
+    .notification-bell-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid #E5E7F0;
+      background: #FFFFFF;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      position: relative;
+      color: #4B5563;
+      transition: background 0.2s;
+    }
+    .notification-bell-btn:hover {
+      background: #F3F4F6;
+    }
+    .bell-dot {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      width: 8px;
+      height: 8px;
+      background: #EF4444;
+      border-radius: 50%;
+      border: 2px solid #FFFFFF;
+    }
+    .recruiter-pill-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 12px 4px 4px;
+      border: 1px solid #E5E7F0;
+      border-radius: 30px;
+      background: #FFFFFF;
+      text-decoration: none;
+      color: #10152E;
+    }
+    .recruiter-pill-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #10152E;
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 13px;
+      display: grid;
+      place-items: center;
+    }
+    .recruiter-pill-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+    .recruiter-pill-name {
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .recruiter-pill-role {
+      font-size: 11px;
+      color: #4F20E8;
+      font-weight: 600;
+    }
+    /* Main Content Body */
+    .portal-content {
+      padding: 32px;
+      flex: 1;
+    }
+    /* Welcome Header */
+    .welcome-banner-recruiter {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .welcome-text h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #10152E;
+      letter-spacing: -0.6px;
+      margin-bottom: 4px;
+    }
+    .welcome-text p {
+      color: #6B7280;
+      font-size: 15px;
+      margin: 0;
+    }
+    /* 4 Stat Cards in a row */
+    .recruiter-stats-quad {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr) 0.8fr;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card-colored {
+      border-radius: 14px;
+      padding: 22px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card-colored:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(16, 21, 46, 0.08);
+    }
+    /* 1. Active Jobs - Purple Card */
+    .card-purple {
+      background: #EDE9FE;
+      border: 1px solid #DDD6FE;
+    }
+    .card-purple .stat-colored-icon {
+      background: #DDD6FE;
+      color: #6D28D9;
+    }
+    .card-purple .stat-colored-number {
+      color: #4C1D95;
+    }
+    .card-purple .stat-colored-label {
+      color: #6D28D9;
+    }
+    /* 2. Total Applications - Blue Card */
+    .card-blue {
+      background: #DBEAFE;
+      border: 1px solid #BFDBFE;
+    }
+    .card-blue .stat-colored-icon {
+      background: #BFDBFE;
+      color: #2563EB;
+    }
+    .card-blue .stat-colored-number {
+      color: #1E3A8A;
+    }
+    .card-blue .stat-colored-label {
+      color: #1D4ED8;
+    }
+    /* 3. Shortlisted - Green Card */
+    .card-green {
+      background: #D1FAE5;
+      border: 1px solid #A7F3D0;
+    }
+    .card-green .stat-colored-icon {
+      background: #A7F3D0;
+      color: #059669;
+    }
+    .card-green .stat-colored-number {
+      color: #064E3B;
+    }
+    .card-green .stat-colored-label {
+      color: #047857;
+    }
+    /* 4. Hired - Orange/Amber Card */
+    .card-orange {
+      background: #FEF3C7;
+      border: 1px solid #FDE68A;
+    }
+    .card-orange .stat-colored-icon {
+      background: #FDE68A;
+      color: #D97706;
+    }
+    .card-orange .stat-colored-number {
+      color: #78350F;
+    }
+    .card-orange .stat-colored-label {
+      color: #B45309;
+    }
+    /* 5. Rejected - Soft Red Card */
+    .card-red {
+      background: #FEE2E2;
+      border: 1px solid #FECACA;
+    }
+    .card-red .stat-colored-icon {
+      background: #FECACA;
+      color: #DC2626;
+    }
+    .card-red .stat-colored-number {
+      color: #991B1B;
+    }
+    .card-red .stat-colored-label {
+      color: #B91C1C;
+    }
+    .stat-colored-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .stat-colored-data {
+      display: flex;
+      flex-direction: column;
+    }
+    .stat-colored-number {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .stat-colored-label {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    /* Section Headings */
+    .recruiter-section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .recruiter-section-heading h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #10152E;
+      margin: 0;
+    }
+    .view-all-link {
+      color: #4F20E8;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: gap 0.2s;
+    }
+    .view-all-link:hover {
+      gap: 8px;
+    }
+    @media (max-width: 1200px) {
+      .recruiter-stats-quad {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 768px) {
+      .recruiter-portal-wrapper {
+        flex-direction: column;
+      }
+      .portal-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .sidebar-nav {
+        flex-direction: row;
+        overflow-x: auto;
+      }
+      .recruiter-stats-quad {
+        grid-template-columns: 1fr;
+      }
+      .portal-content {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hidden accessibility and mobile fallback session anchors -->
+  <header class="site-header" style="display:none;">
+    <nav class="navbar container">
+      <a href="index.html" class="brand"><span class="brand-icon">J</span>JobPortal<span class="brand-dot">.</span></a>
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Toggle navigation">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Find Jobs</a>
+        <a href="companies.html">Companies</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+        <div class="mobile-auth"></div>
+      </div>
+      <div class="nav-actions"></div>
+    </nav>
+  </header>
+
+  <div class="recruiter-portal-wrapper">
+    <!-- Left Dark Navy Sidebar -->
+    <aside class="portal-sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-brand">
+          <span class="brand-icon">J</span>
+          <span>JobPortal</span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="sidebar-nav-title">Recruiter Menu</span>
+        <a href="recruiter-dashboard.html" class="sidebar-link active">
+          <span class="sidebar-link-icon">▦</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#assignedJobsSection" class="sidebar-link" id="sidebarPostJobBtn">
+          <span class="sidebar-link-icon">＋</span>
+          <span>Post a Job</span>
+        </a>
+        <a href="#assignedJobsSection" class="sidebar-link">
+          <span class="sidebar-link-icon">💼</span>
+          <span>My Jobs</span>
+        </a>
+        <a href="#applicationsSection" class="sidebar-link">
+          <span class="sidebar-link-icon">👥</span>
+          <span>Applications</span>
+        </a>
+        <a href="companies.html" class="sidebar-link">
+          <span class="sidebar-link-icon">🏢</span>
+          <span>Company Profile</span>
+        </a>
+        <a href="profile.html" class="sidebar-link">
+          <span class="sidebar-link-icon">⚙</span>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="sidebar-logout-btn" data-logout="true">
+          <span>⎋</span>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Right Main Content Area -->
+    <div class="portal-main-wrapper">
+      <!-- Top Header -->
+      <header class="portal-topbar">
+        <div class="topbar-title-wrap">
+          <h2>Recruiter Dashboard</h2>
+        </div>
+
+        <div class="topbar-actions">
+        <a href="#assignedJobsSection" class="post-job-top-btn" id="btnOpenPostJob" title="Post a new position">
+          <span>+</span> Post New Job
+        </a>
+
+          <button type="button" class="notification-bell-btn" aria-label="Notifications">
+            <span>🔔</span>
+            <span class="bell-dot"></span>
+          </button>
+
+          <a href="profile.html" class="recruiter-pill-profile" title="Recruiter Profile">
+            <span class="recruiter-pill-avatar">HR</span>
+            <div class="recruiter-pill-info">
+              <span class="recruiter-pill-name">Alex Morgan</span>
+              <span class="recruiter-pill-role">Talent Acquisition</span>
+            </div>
+          </a>
+        </div>
+      </header>
+
+      <main class="portal-content">
+        <!-- Toast Feedback -->
+        <div class="recruiter-toast" id="recruiterToast" role="status" aria-live="polite">
+          <span id="toastMessage">Application status updated successfully.</span>
+        </div>
+
+        <!-- Recruiter Welcome Greeting & Banner (Preserves .recruiter-banner for recruiter.js) -->
+        <section class="recruiter-banner" style="margin-bottom: 24px;">
+          <div class="recruiter-banner-info">
+            <span class="recruiter-badge">HR & Talent Pipeline</span>
+            <h1>Welcome, <span id="recruiterName">HR at TechNova</span> 👋</h1>
+            <p>
+              Manage your job postings and applications for <strong><span id="recruiterCompany">Google</span></strong>.
+              Review applicants, inspect resumes, and update recruitment statuses in real time.
+            </p>
+          </div>
+          <div class="recruiter-banner-actions">
+            <button type="button" class="btn-white" id="switchCandidateBtn" title="Switch to Priya's candidate view to verify statuses">
+              ⇄ Switch to Candidate View
+            </button>
+            <a href="jobs.html" class="btn-ghost-white">Browse All Openings ↗</a>
+          </div>
+        </section>
+
+        <!-- 4 Stat Cards in a row (+ Rejected card) -->
+        <section class="recruiter-stats-quad" aria-label="Recruitment Overview">
+          <!-- Card 1: Active Jobs / In Review (Purple card) -->
+          <article class="stat-card-colored card-purple">
+            <div class="stat-colored-icon">◷</div>
+            <div class="stat-colored-data">
+              <span class="stat-colored-number" id="kpiReview">5</span>
+              <span class="stat-colored-label">Active Jobs</span>
+            </div>
+          </article>
+
+          <!-- Card 2: Total Applications (Blue card) -->
+          <article class="stat-card-colored card-blue">
+            <div class="stat-colored-icon">▤</div>
+            <div class="stat-colored-data">
+              <span class="stat-colored-number" id="kpiTotal">128</span>
+              <span class="stat-colored-label">Total Applications</span>
+            </div>
+          </article>
+
+          <!-- Card 3: Shortlisted (Green card) -->
+          <article class="stat-card-colored card-green">
+            <div class="stat-colored-icon">★</div>
+            <div class="stat-colored-data">
+              <span class="stat-colored-number" id="kpiShortlisted">24</span>
+              <span class="stat-colored-label">Shortlisted</span>
+            </div>
+          </article>
+
+          <!-- Card 4: Hired (Orange/Amber card) -->
+          <article class="stat-card-colored card-orange">
+            <div class="stat-colored-icon">✓</div>
+            <div class="stat-colored-data">
+              <span class="stat-colored-number" id="kpiHired">6</span>
+              <span class="stat-colored-label">Hired</span>
+            </div>
+          </article>
+
+          <!-- Card 5: Rejected (Soft Red card) -->
+          <article class="stat-card-colored card-red">
+            <div class="stat-colored-icon">✕</div>
+            <div class="stat-colored-data">
+              <span class="stat-colored-number" id="kpiRejected">0</span>
+              <span class="stat-colored-label">Rejected</span>
+            </div>
+          </article>
+        </section>
+
+        <!-- Assigned Job Openings Section -->
+        <section class="recruiter-jobs-section" id="assignedJobsSection" aria-label="Assigned Openings" style="margin-bottom: 34px;">
+          <div class="section-toolbar" style="margin-bottom: 16px;">
+            <div>
+              <h2 style="font-size: 18px; font-weight: 800; color: #10152E; margin: 0;">Openings Assigned to Your Account</h2>
+              <p style="font-size: 13px; color: var(--muted); margin-top: 4px;">
+                Positions loaded from XML catalog assigned to <span id="recruiterEmailBadge" style="font-weight: 600; color: #4F20E8;">recruiter@example.com</span>.
+              </p>
+            </div>
+            <span class="r-badge under-review" id="assignedJobsCount">Loading Openings...</span>
+          </div>
+
+          <div class="recruiter-jobs-grid" id="assignedJobsGrid">
+            <!-- Dynamically populated by js/recruiter.js -->
+          </div>
+        </section>
+
+        <!-- Section Toolbar & Recent Applications Header -->
+        <div class="section-toolbar" id="applicationsSection">
+          <div>
+            <h2 style="font-size: 18px; font-weight: 800; color: #10152E; margin: 0;">Recent Applications</h2>
+            <p style="font-size: 13px; color: var(--muted); margin-top: 4px;">
+              Live submissions for your assigned openings. Status changes persist in LocalStorage.
+            </p>
+          </div>
+
+          <div class="filters-wrap">
+            <input type="search" id="recruiterSearch" placeholder="Search by name or email..." aria-label="Search applicants">
+            <select id="recruiterJobFilter" aria-label="Filter by job">
+              <option value="all">All Managed Jobs</option>
+            </select>
+            <select id="recruiterStatusFilter" aria-label="Filter by status">
+              <option value="all">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Applied">Applied</option>
+              <option value="Under Review">Under Review</option>
+              <option value="Shortlisted">Shortlisted</option>
+              <option value="Hired">Hired</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Applications Table with Columns matching reference design -->
+        <section class="table-card" aria-label="Applications List" style="margin-top: 14px;">
+          <div class="table-responsive">
+            <table class="recruiter-table">
+              <thead>
+                <tr>
+                  <th>Candidate</th>
+                  <th>Job Title</th>
+                  <th>Applied On</th>
+                  <th>Status</th>
+                  <th>Update Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="applicationsTableBody">
+                <!-- Dynamically populated by js/recruiter.js -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+
+      <!-- Application Detail & Resume Preview Modal -->
+      <div class="modal-overlay" id="appDetailModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="modalTitle">Applicant Profile &amp; Submission</h3>
+            <button type="button" class="modal-close" id="modalCloseBtn" aria-label="Close dialog">✕</button>
+          </div>
+          <div id="modalBody">
+            <!-- Dynamically populated by js/recruiter.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Post / Edit Job Modal -->
+      <div class="modal-overlay" id="postJobModal" role="dialog" aria-modal="true" aria-labelledby="postJobModalTitle" style="display:none;">
+        <div class="modal-content" style="max-width: 720px; width: 95%; max-height: 90vh; overflow-y: auto;">
+          <div class="modal-header">
+            <h3 id="postJobModalTitle" style="font-size: 20px; font-weight: 800; color: #10152E;">Post a New Job Opening</h3>
+            <button type="button" class="modal-close" id="postJobCloseBtn" aria-label="Close dialog">✕</button>
+          </div>
+          <form id="postJobForm" style="display: flex; flex-direction: column; gap: 16px; margin-top: 10px;">
+            <input type="hidden" id="editJobId" value="">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <label class="form-field">
+                <span style="font-size: 13px; font-weight: 600; color: #10152E;">Job Title *</span>
+                <input type="text" id="jobTitle" required placeholder="e.g. Senior Frontend Developer" style="padding: 10px 14px; border: 1.5px solid #E5E7F0; border-radius: 8px;">
+              </label>
+              <label class="form-field">
+                <span style="font-size: 13px; font-weight: 600; color: #10152E;">Company Name *</span>
+                <input type="text" id="jobCompany" required placeholder="e.g. Google, TechNova" style="padding: 10px 14px; border: 1.5px solid #E5E7F0; border-radius: 8px;">
+              </label>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+              <label class="form-field">
+                <span style="font-size: 13px; font-weight: 600; color: #10152E;">Job Category *</span>
+                <select id="jobCategory" required style="padding: 10px 14px; border: 1.5px solid #E5E7F0; border-radius: 8px; background: white;">
+                  <option value="Technology">Technology</option>
+                  <option value="Design">Design</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Business">Business</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Healthcare">Healthcare</option>
+                </select>
+              </label>
+              <label class="form-field">
+                <span style="font-size: 13px; font-weight: 600; color: #10152E;">Work Mode *</span>
+                <select id="jobWorkMode" required style="padding: 10px 14px; border: 1.5px solid #E5E7F0; border-radius: 8px; background: white;">
+                  <option value="On-site">On-site</option>
+                  <option value="Remote">Remote</option>
+                  <option value="Hybrid">Hybrid</option>
+                </select>
+              </label>
+              <label class="form-field">
+                <span style="font-size: 13px; font-weight: 600; color: #10152E;">Job Type *</span>
+                <select id="jobType" required style="padding: 10px 14px; border: 1.5px solid #E5E7F0; border-radius: 8px; background: white;">
+                  <option value="Full-time">Full-time</option>
+                  <option value="Part-time">Part-time</option>
+                  <option value="Internship">Internship</option>
+                  <option value="Contract">Contract</option>
+                </select>
+              </label>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <label class="form-field">
+                <span style="font-size: 13px; font-weight: 600; color: #10152E;">Job Location *</span>
+                <input type="text" id="jobLocation" required placeholder="e.g. Bengaluru, India or Remote" style="padding: 10px 14px; border: 1.5px solid #E5E7F0; border-radius: 8px;">
+              </label>
+              <label class="form-field">
+                <span style="font-size: 13px; font-weight: 600; color: #10152E;">Salary Range *</span>
+                <input type="text" id="jobSalary" required placeholder="e.g. ₹8-14 LPA or ₹30-50K/mo" style="padding: 10px 14px; border: 1.5px solid #E5E7F0; border-radius: 8px;">
+              </label>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+              <label class="form-field">
+                <span style="font-size: 13px; font-weight: 600; color: #10152E;">Experience Required *</span>
+                <input type="text" id="jobExperience" required placeholder="e.g. 1-3 years, Fresher" style="padding: 10px 14px; border: 1.5px solid #E5E7F0; border-radius: 8px;">
+              </label>
+              <label class="form-field">
+                <span style="font-size: 13px; font-weight: 600; color: #10152E;">Number of Vacancies *</span>
+                <input type="number" id="jobVacancies" min="1" max="100" value="1" required style="padding: 10px 14px; border: 1.5px solid #E5E7F0; border-radius: 8px;">
+              </label>
+              <label class="form-field">
+                <span style="font-size: 13px; font-weight: 600; color: #10152E;">Application Deadline</span>
+                <input type="date" id="jobDeadline" style="padding: 10px 14px; border: 1.5px solid #E5E7F0; border-radius: 8px;">
+              </label>
+            </div>
+
+            <label class="form-field">
+              <span style="font-size: 13px; font-weight: 600; color: #10152E;">Education Requirements *</span>
+              <input type="text" id="jobEducation" required placeholder="e.g. Bachelor's Degree in Computer Science, BCA, B.Tech, or equivalent" style="padding: 10px 14px; border: 1.5px solid #E5E7F0; border-radius: 8px;">
+            </label>
+
+            <label class="form-field">
+              <span style="font-size: 13px; font-weight: 600; color: #10152E;">Job Description *</span>
+              <textarea id="jobDescription" rows="3" required placeholder="Detailed overview of the role, team, and company mission..." style="padding: 10px 14px; border: 1.5px solid #E5E7F0; border-radius: 8px; font-family: inherit; font-size: 14px;"></textarea>
+            </label>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <label class="form-field">
+                <span style="font-size: 13px; font-weight: 600; color: #10152E;">Key Responsibilities (One per line)</span>
+                <textarea id="jobResponsibilities" rows="3" placeholder="Develop responsive web applications&#10;Collaborate with product designers&#10;Write clean unit tests" style="padding: 10px 14px; border: 1.5px solid #E5E7F0; border-radius: 8px; font-family: inherit; font-size: 13px;"></textarea>
+              </label>
+              <label class="form-field">
+                <span style="font-size: 13px; font-weight: 600; color: #10152E;">Required Skills (Comma separated) *</span>
+                <textarea id="jobSkills" rows="3" required placeholder="HTML5, CSS3, JavaScript, React, MySQL, Git" style="padding: 10px 14px; border: 1.5px solid #E5E7F0; border-radius: 8px; font-family: inherit; font-size: 13px;"></textarea>
+              </label>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px;">
+              <button type="button" class="btn btn-outline" id="postJobCancelBtn" style="padding: 10px 20px;">Cancel</button>
+              <button type="submit" class="btn btn-primary" id="postJobSubmitBtn" style="padding: 10px 24px;">Publish Job Opening →</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <footer class="site-footer" style="background:#FFFFFF; border-top:1px solid #E5E7F0; padding:20px 32px; margin-top:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; font-size:13px; color:#6B7280;">
+          <span>© <span id="currentYear"></span> JobPortal. Recruiter pipeline simulation demo.</span>
+          <div style="display:flex; gap:16px;">
+            <a href="jobs.html" style="color:#4F20E8; font-weight:600;">Find Jobs</a>
+            <a href="about.html" style="color:#6B7280;">About</a>
+            <a href="contact.html" style="color:#6B7280;">Contact</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+</body>
+</html>

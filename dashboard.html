@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Review your JobPortal demo applications, saved jobs, and profile progress.">
-  <title>Dashboard | JobPortal</title>
+  <meta name="description" content="Review your JobPortal applications, saved jobs, and career profile progress.">
+  <title>Candidate Dashboard | JobPortal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,101 +14,801 @@
   <script src="js/session.js" defer></script>
   <script src="js/main.js" defer></script>
   <script src="js/dashboard.js" defer></script>
+  <style>
+    /* Dedicated Dashboard Visual Enhancements matching reference design */
+    body {
+      background: #F8F8FC;
+      margin: 0;
+      color: var(--text);
+    }
+    .candidate-portal-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+    /* Dark Navy Sidebar */
+    .portal-sidebar {
+      width: 260px;
+      background: #10152E;
+      color: #FFFFFF;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+    .sidebar-header {
+      padding: 24px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #FFFFFF;
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+    .sidebar-brand .brand-icon {
+      background: #4F20E8;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: #FFFFFF;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(79, 32, 232, 0.4);
+    }
+    .sidebar-nav {
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .sidebar-nav-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #6B7280;
+      font-weight: 700;
+      padding: 10px 12px 4px;
+    }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      color: #94A3B8;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    .sidebar-link:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #FFFFFF;
+    }
+    .sidebar-link.active {
+      background: #4F20E8;
+      color: #FFFFFF;
+      font-weight: 600;
+      box-shadow: 0 4px 14px rgba(79, 32, 232, 0.35);
+    }
+    .sidebar-link-icon {
+      font-size: 16px;
+      width: 20px;
+      display: inline-grid;
+      place-items: center;
+    }
+    .sidebar-footer {
+      padding: 18px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .sidebar-logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 14px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      color: #EF4444;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .sidebar-logout-btn:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: #EF4444;
+    }
+    /* Main Content Area */
+    .portal-main-wrapper {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: #F8F8FC;
+    }
+    /* Top Header */
+    .portal-topbar {
+      background: #FFFFFF;
+      border-bottom: 1px solid #E5E7F0;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 80;
+    }
+    .topbar-title-wrap h2 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #10152E;
+      margin: 0;
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .notification-bell-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid #E5E7F0;
+      background: #FFFFFF;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      position: relative;
+      color: #4B5563;
+      transition: background 0.2s;
+    }
+    .notification-bell-btn:hover {
+      background: #F3F4F6;
+    }
+    .bell-dot {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      width: 8px;
+      height: 8px;
+      background: #EF4444;
+      border-radius: 50%;
+      border: 2px solid #FFFFFF;
+    }
+    .user-pill-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 10px 4px 4px;
+      border: 1px solid #E5E7F0;
+      border-radius: 30px;
+      background: #FFFFFF;
+      text-decoration: none;
+      color: #10152E;
+    }
+    .user-pill-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #4F20E8;
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 13px;
+      display: grid;
+      place-items: center;
+    }
+    .user-pill-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+      padding-right: 4px;
+    }
+    .user-pill-name {
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .user-pill-role {
+      font-size: 11px;
+      color: #6B7280;
+    }
+    /* Main Content Body */
+    .portal-content {
+      padding: 32px;
+      flex: 1;
+    }
+    /* Welcome Header */
+    .welcome-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .welcome-text h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #10152E;
+      letter-spacing: -0.6px;
+      margin-bottom: 4px;
+    }
+    .welcome-text p {
+      color: #6B7280;
+      font-size: 15px;
+      margin: 0;
+    }
+    /* 4 Stat Cards in a row */
+    .stats-quad-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+    .stat-card-colored {
+      border-radius: 14px;
+      padding: 22px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card-colored:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(16, 21, 46, 0.08);
+    }
+    /* Card 1: Lavender */
+    .card-lavender {
+      background: #EDE9FE;
+      border: 1px solid #DDD6FE;
+    }
+    .card-lavender .stat-colored-icon {
+      background: #DDD6FE;
+      color: #6D28D9;
+    }
+    .card-lavender .stat-colored-number {
+      color: #4C1D95;
+    }
+    .card-lavender .stat-colored-label {
+      color: #6D28D9;
+    }
+    /* Card 2: Mint / Green */
+    .card-mint {
+      background: #D1FAE5;
+      border: 1px solid #A7F3D0;
+    }
+    .card-mint .stat-colored-icon {
+      background: #A7F3D0;
+      color: #059669;
+    }
+    .card-mint .stat-colored-number {
+      color: #064E3B;
+    }
+    .card-mint .stat-colored-label {
+      color: #047857;
+    }
+    /* Card 3: Yellow / Amber */
+    .card-amber {
+      background: #FEF3C7;
+      border: 1px solid #FDE68A;
+    }
+    .card-amber .stat-colored-icon {
+      background: #FDE68A;
+      color: #D97706;
+    }
+    .card-amber .stat-colored-number {
+      color: #78350F;
+    }
+    .card-amber .stat-colored-label {
+      color: #B45309;
+    }
+    /* Card 4: Light Blue */
+    .card-blue {
+      background: #DBEAFE;
+      border: 1px solid #BFDBFE;
+    }
+    .card-blue .stat-colored-icon {
+      background: #BFDBFE;
+      color: #2563EB;
+    }
+    .card-blue .stat-colored-number {
+      color: #1E3A8A;
+    }
+    .card-blue .stat-colored-label {
+      color: #1D4ED8;
+    }
+    .stat-colored-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .stat-colored-data {
+      display: flex;
+      flex-direction: column;
+    }
+    .stat-colored-number {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .stat-colored-label {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    /* Section Headings */
+    .dashboard-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .dashboard-section-header h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #10152E;
+      margin: 0;
+    }
+    .view-all-link {
+      color: #4F20E8;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: gap 0.2s;
+    }
+    .view-all-link:hover {
+      gap: 8px;
+    }
+    /* Recommended Jobs Grid */
+    .recommended-jobs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+    .rec-job-card {
+      background: #FFFFFF;
+      border: 1px solid #E5E7F0;
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 10px rgba(16, 21, 46, 0.03);
+    }
+    .rec-job-card:hover {
+      border-color: rgba(79, 32, 232, 0.3);
+      box-shadow: 0 8px 24px rgba(79, 32, 232, 0.09);
+      transform: translateY(-2px);
+    }
+    .rec-job-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .rec-company-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: #F8F8FC;
+      border: 1px solid #E5E7F0;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #4F20E8;
+    }
+    .rec-company-logo.google { background: #EEF2FF; color: #4338CA; }
+    .rec-company-logo.amazon { background: #FFFBEB; color: #D97706; }
+    .rec-company-logo.design { background: #FDF2F8; color: #DB2777; }
+    .bookmark-btn {
+      background: none;
+      border: none;
+      color: #9CA3AF;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .bookmark-btn:hover {
+      color: #4F20E8;
+    }
+    .rec-job-body h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #10152E;
+      margin: 0 0 6px;
+    }
+    .rec-job-meta {
+      font-size: 13px;
+      color: #6B7280;
+    }
+    .rec-job-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .rec-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 6px;
+      background: #F3F4F6;
+      color: #4B5563;
+    }
+    .rec-tag.salary {
+      background: #EDE9FE;
+      color: #6D28D9;
+    }
+    .rec-job-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid #F1F5F9;
+    }
+    .rec-apply-btn {
+      background: #4F20E8;
+      color: #FFFFFF;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .rec-apply-btn:hover {
+      background: #3A17B8;
+    }
+    /* Mobile responsive sidebar */
+    @media (max-width: 1024px) {
+      .stats-quad-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .recommended-jobs-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 768px) {
+      .candidate-portal-wrapper {
+        flex-direction: column;
+      }
+      .portal-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .sidebar-nav {
+        flex-direction: row;
+        overflow-x: auto;
+      }
+      .stats-quad-grid {
+        grid-template-columns: 1fr;
+      }
+      .recommended-jobs-grid {
+        grid-template-columns: 1fr;
+      }
+      .portal-content {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <header class="site-header">
+
+  <!-- Hidden accessibility and mobile fallback session anchors -->
+  <header class="site-header" style="display:none;">
     <nav class="navbar container">
-      <a href="index.html" class="brand" aria-label="JobPortal home">
-        <span class="brand-icon">J</span>JobPortal<span class="brand-dot">.</span>
-      </a>
-      <button class="menu-toggle" id="menuToggle" type="button"
-        aria-label="Toggle navigation" aria-expanded="false">☰</button>
+      <a href="index.html" class="brand"><span class="brand-icon">J</span>JobPortal<span class="brand-dot">.</span></a>
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Toggle navigation">☰</button>
       <div class="nav-links" id="navLinks">
         <a href="index.html">Home</a>
         <a href="jobs.html">Find Jobs</a>
         <a href="companies.html">Companies</a>
-        <a href="about.html">About</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
         <div class="mobile-auth"></div>
       </div>
       <div class="nav-actions"></div>
     </nav>
   </header>
 
-  <main class="dashboard-page">
-    <div class="container">
-      <section class="dashboard-welcome">
-        <div>
-          <span class="section-kicker">YOUR CAREER SPACE</span>
-          <h1>Welcome back, <span id="welcomeName">there</span></h1>
-          <p>Review your activity and keep your career profile up to date.</p>
+  <div class="candidate-portal-wrapper">
+    <!-- Left Dark Navy Sidebar -->
+    <aside class="portal-sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-brand">
+          <span class="brand-icon">J</span>
+          <span>JobPortal</span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="sidebar-nav-title">Menu</span>
+        <a href="dashboard.html" class="sidebar-link active">
+          <span class="sidebar-link-icon">▦</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="profile.html" class="sidebar-link">
+          <span class="sidebar-link-icon">👤</span>
+          <span>Profile</span>
+        </a>
+        <a href="jobs.html" class="sidebar-link">
+          <span class="sidebar-link-icon">♡</span>
+          <span>Saved Jobs</span>
+        </a>
+        <a href="applications.html" class="sidebar-link">
+          <span class="sidebar-link-icon">▤</span>
+          <span>Applied Jobs</span>
+        </a>
+        <a href="profile.html" class="sidebar-link">
+          <span class="sidebar-link-icon">📄</span>
+          <span>Resume</span>
+        </a>
+        <a href="profile.html" class="sidebar-link">
+          <span class="sidebar-link-icon">⚙</span>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="sidebar-logout-btn" data-logout="true">
+          <span>⎋</span>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Right Main Content Area -->
+    <div class="portal-main-wrapper">
+      <!-- Top Header -->
+      <header class="portal-topbar">
+        <div class="topbar-title-wrap">
+          <h2>Candidate Dashboard</h2>
         </div>
-        <a href="jobs.html" class="btn btn-primary">Find opportunities →</a>
-      </section>
 
-      <section class="dashboard-account" aria-label="Account information">
-        <div class="dashboard-avatar" id="dashboardAvatar">J</div>
-        <div>
-          <h2 id="dashboardName">Job seeker</h2>
-          <p id="dashboardEmail"></p>
+        <div class="topbar-actions">
+          <button type="button" class="notification-bell-btn" aria-label="Notifications">
+            <span>🔔</span>
+            <span class="bell-dot"></span>
+          </button>
+
+          <a href="profile.html" class="user-pill-profile" title="View Profile">
+            <span class="user-pill-avatar" id="dashboardAvatar">AV</span>
+            <div class="user-pill-info">
+              <span class="user-pill-name" id="dashboardName">Anjali Verma</span>
+              <span class="user-pill-role">Candidate</span>
+            </div>
+            <span id="dashboardEmail" style="display:none;"></span>
+          </a>
         </div>
-        <a href="profile.html" class="dashboard-inline-link">Edit profile →</a>
-      </section>
+      </header>
 
-      <section class="dashboard-stats" aria-label="Your activity">
-        <article class="dashboard-stat">
-          <span class="dashboard-stat-icon">▤</span>
-          <div><p>Total applications</p><strong id="totalApplications">0</strong></div>
-        </article>
-        <article class="dashboard-stat">
-          <span class="dashboard-stat-icon saved">♡</span>
-          <div><p>Saved jobs</p><strong id="savedJobsCount">0</strong></div>
-        </article>
-        <article class="dashboard-stat">
-          <span class="dashboard-stat-icon progress">◷</span>
-          <div><p>In progress</p><strong id="inProgressApplications">0</strong></div>
-        </article>
-        <article class="dashboard-stat">
-          <span class="dashboard-stat-icon completion">✓</span>
-          <div><p>Profile complete</p><strong id="profileCompletion">0%</strong></div>
-        </article>
-      </section>
-
-      <section class="dashboard-columns">
-        <article class="dashboard-panel">
-          <div class="dashboard-panel-heading">
-            <div><h2>Recent applications</h2><p>Your latest local demo records.</p></div>
-            <a href="applications.html">View all →</a>
+      <main class="portal-content">
+        <!-- Welcome Greeting Banner (Preserving .dashboard-welcome for JS recruiter check) -->
+        <section class="dashboard-welcome welcome-banner">
+          <div class="welcome-text">
+            <span class="section-kicker">OVERVIEW</span>
+            <h1>Welcome, <span id="welcomeName">Anjali Verma</span> 👋</h1>
+            <p>Find new opportunities and track your applications.</p>
           </div>
-          <div class="dashboard-list" id="recentApplications"></div>
-        </article>
+          <a href="jobs.html" class="btn btn-primary" style="padding: 10px 20px; font-size: 14px;">Find opportunities →</a>
+        </section>
 
-        <article class="dashboard-panel">
-          <div class="dashboard-panel-heading">
-            <div><h2>Saved jobs</h2><p>Roles you want to revisit.</p></div>
-            <a href="jobs.html">Find jobs →</a>
+        <!-- 4 Stat Cards in a row -->
+        <section class="stats-quad-grid" aria-label="Dashboard Statistics">
+          <!-- 1. Applied Jobs: Lavender Card (#EDE9FE) -->
+          <article class="stat-card-colored card-lavender">
+            <div class="stat-colored-icon">▤</div>
+            <div class="stat-colored-data">
+              <span class="stat-colored-number" id="totalApplications">12</span>
+              <span class="stat-colored-label">Applied Jobs</span>
+            </div>
+          </article>
+
+          <!-- 2. Saved Jobs: Mint/Green Card (#D1FAE5) -->
+          <article class="stat-card-colored card-mint">
+            <div class="stat-colored-icon">♡</div>
+            <div class="stat-colored-data">
+              <span class="stat-colored-number" id="savedJobsCount">4</span>
+              <span class="stat-colored-label">Saved Jobs</span>
+            </div>
+          </article>
+
+          <!-- 3. Shortlisted: Yellow/Amber Card (#FEF3C7) -->
+          <article class="stat-card-colored card-amber">
+            <div class="stat-colored-icon">★</div>
+            <div class="stat-colored-data">
+              <span class="stat-colored-number" id="inProgressApplications">2</span>
+              <span class="stat-colored-label">Shortlisted</span>
+            </div>
+          </article>
+
+          <!-- 4. Hired / Profile Strength: Light Blue Card (#DBEAFE) -->
+          <article class="stat-card-colored card-blue">
+            <div class="stat-colored-icon">✓</div>
+            <div class="stat-colored-data">
+              <span class="stat-colored-number" id="profileCompletion">1</span>
+              <span class="stat-colored-label">Hired</span>
+            </div>
+          </article>
+        </section>
+
+        <!-- Recommended Jobs Section -->
+        <section class="recommended-section" style="margin-bottom: 36px;">
+          <div class="dashboard-section-header">
+            <h2>Recommended Jobs</h2>
+            <a href="jobs.html" class="view-all-link">View All &rarr;</a>
           </div>
-          <div class="dashboard-list" id="savedJobsList"></div>
-        </article>
-      </section>
 
-      <section class="dashboard-quick-links" aria-label="Quick links">
-        <h2>Quick links</h2>
-        <a href="jobs.html"><span>⌕</span><strong>Find Jobs</strong><small>Explore sample opportunities</small></a>
-        <a href="profile.html"><span>◉</span><strong>My Profile</strong><small>Update your career details</small></a>
-        <a href="applications.html"><span>▤</span><strong>My Applications</strong><small>Review your local demo records</small></a>
-      </section>
+          <div class="recommended-jobs-grid">
+            <!-- Job Card 1 -->
+            <article class="rec-job-card">
+              <div>
+                <div class="rec-job-top">
+                  <div class="rec-company-logo google">G</div>
+                  <button type="button" class="bookmark-btn" title="Save Job">♡</button>
+                </div>
+                <div class="rec-job-body" style="margin-top: 14px;">
+                  <h3>Frontend Developer</h3>
+                  <p class="rec-job-meta">Google • Bengaluru, Karnataka</p>
+                  <div class="rec-job-tags">
+                    <span class="rec-tag">Full-Time</span>
+                    <span class="rec-tag salary">₹18-28 LPA</span>
+                    <span class="rec-tag">React.js</span>
+                  </div>
+                </div>
+              </div>
+              <div class="rec-job-bottom">
+                <a href="job-details.html?id=frontend" style="font-size: 13px; color: #4F20E8; font-weight: 600;">Details</a>
+                <a href="apply.html?id=frontend" class="rec-apply-btn">Apply Now</a>
+              </div>
+            </article>
 
-      <p class="dashboard-demo-note">
-        Demo only: this dashboard uses data stored in this browser. Applications are not sent to employers.
-      </p>
+            <!-- Job Card 2 -->
+            <article class="rec-job-card">
+              <div>
+                <div class="rec-job-top">
+                  <div class="rec-company-logo amazon">A</div>
+                  <button type="button" class="bookmark-btn" title="Save Job">♡</button>
+                </div>
+                <div class="rec-job-body" style="margin-top: 14px;">
+                  <h3>Software Engineer Intern</h3>
+                  <p class="rec-job-meta">Amazon • Hyderabad, Telangana</p>
+                  <div class="rec-job-tags">
+                    <span class="rec-tag">Internship</span>
+                    <span class="rec-tag salary">₹45,000 / mo</span>
+                    <span class="rec-tag">Java / Cloud</span>
+                  </div>
+                </div>
+              </div>
+              <div class="rec-job-bottom">
+                <a href="job-details.html?id=intern" style="font-size: 13px; color: #4F20E8; font-weight: 600;">Details</a>
+                <a href="apply.html?id=intern" class="rec-apply-btn">Apply Now</a>
+              </div>
+            </article>
+
+            <!-- Job Card 3 -->
+            <article class="rec-job-card">
+              <div>
+                <div class="rec-job-top">
+                  <div class="rec-company-logo design">D</div>
+                  <button type="button" class="bookmark-btn" title="Save Job">♡</button>
+                </div>
+                <div class="rec-job-body" style="margin-top: 14px;">
+                  <h3>UI/UX Designer</h3>
+                  <p class="rec-job-meta">Design Studio • Remote, India</p>
+                  <div class="rec-job-tags">
+                    <span class="rec-tag">Full-Time</span>
+                    <span class="rec-tag salary">₹12-16 LPA</span>
+                    <span class="rec-tag">Figma / UI</span>
+                  </div>
+                </div>
+              </div>
+              <div class="rec-job-bottom">
+                <a href="job-details.html?id=designer" style="font-size: 13px; color: #4F20E8; font-weight: 600;">Details</a>
+                <a href="apply.html?id=designer" class="rec-apply-btn">Apply Now</a>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Two Column Activity: Recent Applications & Saved Jobs -->
+        <section class="dashboard-columns">
+          <article class="dashboard-panel">
+            <div class="dashboard-panel-heading">
+              <div>
+                <h2>Recent applications</h2>
+                <p>Your latest submitted records.</p>
+              </div>
+              <a href="applications.html" class="view-all-link">View all &rarr;</a>
+            </div>
+            <div class="dashboard-list" id="recentApplications">
+              <!-- Dynamically rendered by js/dashboard.js -->
+            </div>
+          </article>
+
+          <article class="dashboard-panel">
+            <div class="dashboard-panel-heading">
+              <div>
+                <h2>Saved jobs</h2>
+                <p>Opportunities saved to revisit.</p>
+              </div>
+              <a href="jobs.html" class="view-all-link">Find jobs &rarr;</a>
+            </div>
+            <div class="dashboard-list" id="savedJobsList">
+              <!-- Dynamically rendered by js/dashboard.js -->
+            </div>
+          </article>
+        </section>
+
+        <!-- Quick Links -->
+        <section class="dashboard-quick-links" aria-label="Quick links" style="margin-top: 28px;">
+          <h2>Quick Navigation</h2>
+          <a href="jobs.html">
+            <span>⌕</span>
+            <strong>Explore Jobs</strong>
+            <small>Search open roles across top tech companies</small>
+          </a>
+          <a href="profile.html">
+            <span>👤</span>
+            <strong>Update Profile</strong>
+            <small>Keep your resume, skills, and bio fresh</small>
+          </a>
+          <a href="applications.html">
+            <span>▤</span>
+            <strong>Application History</strong>
+            <small>Inspect status updates and feedback</small>
+          </a>
+        </section>
+
+        <p class="dashboard-demo-note" style="margin-top: 32px;">
+          Demo only: this dashboard uses data stored in this browser. Applications are not sent to external servers.
+        </p>
+      </main>
+
+      <footer class="site-footer" style="background:#FFFFFF; border-top:1px solid #E5E7F0; padding:20px 32px; margin-top:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; font-size:13px; color:#6B7280;">
+          <span>© <span id="currentYear"></span> JobPortal. Academic project demo.</span>
+          <div style="display:flex; gap:16px;">
+            <a href="jobs.html" style="color:#4F20E8; font-weight:600;">Find Jobs</a>
+            <a href="about.html" style="color:#6B7280;">About</a>
+            <a href="contact.html" style="color:#6B7280;">Contact</a>
+          </div>
+        </div>
+      </footer>
     </div>
-  </main>
+  </div>
 
-  <footer class="site-footer">
-    <div class="container footer-bottom">
-      <span>© <span id="currentYear"></span> JobPortal. Student project demo.</span>
-      <a href="index.html">Return to home →</a>
-    </div>
-  </footer>
 </body>
 </html>

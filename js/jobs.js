@@ -1,65 +1,36 @@
-
 "use strict";
 
-document.addEventListener("DOMContentLoaded", () => {
-  const jobs = [
-    {
-      id: "frontend", title: "Frontend Developer", company: "Google",
-      category: "Technology", type: "Full-time", work: "Hybrid",
-      location: "Bengaluru", salary: "₹8–14 LPA",
-      skills: ["React", "JavaScript"], logo: "G",
-      description: "Build responsive interfaces and improve the experience of web applications."
-    },
-    {
-      id: "designer", title: "UI/UX Designer", company: "Design Studio",
-      category: "Design", type: "Full-time", work: "Remote",
-      location: "Remote", salary: "₹6–10 LPA",
-      skills: ["Figma", "UI/UX"], logo: "D",
-      description: "Design clear user journeys, wireframes and accessible digital experiences."
-    },
-    {
-      id: "intern", title: "Software Engineer Intern", company: "Amazon",
-      category: "Technology", type: "Internship", work: "On-site",
-      location: "Hyderabad", salary: "₹30–50K/mo",
-      skills: ["DSA", "Java"], logo: "a",
-      description: "Learn software development while collaborating on practical engineering tasks."
-    },
-    {
-      id: "marketing", title: "Digital Marketing Associate", company: "Growth Labs",
-      category: "Marketing", type: "Full-time", work: "Hybrid",
-      location: "Mumbai", salary: "₹4–7 LPA",
-      skills: ["SEO", "Content"], logo: "G",
-      description: "Support campaigns, review engagement data and help improve digital reach."
-    },
-    {
-      id: "business", title: "Business Operations Intern", company: "NextStep",
-      category: "Business", type: "Internship", work: "Remote",
-      location: "Remote", salary: "₹15–25K/mo",
-      skills: ["Excel", "Analysis"], logo: "N",
-      description: "Help document processes, organize reports and support operational projects."
-    },
-    {
-      id: "backend", title: "Junior Backend Developer", company: "CloudWorks",
-      category: "Technology", type: "Full-time", work: "On-site",
-      location: "Pune", salary: "₹5–9 LPA",
-      skills: ["Node.js", "SQL"], logo: "C",
-      description: "Work on APIs, data handling and server-side application features."
-    },
-    {
-      id: "content", title: "Content Design Intern", company: "Creative House",
-      category: "Design", type: "Internship", work: "Remote",
-      location: "Remote", salary: "₹12–20K/mo",
-      skills: ["Writing", "Design"], logo: "C",
-      description: "Create helpful content and collaborate with design teams on digital products."
-    },
-    {
-      id: "analyst", title: "Business Analyst", company: "BrightPath",
-      category: "Business", type: "Full-time", work: "Hybrid",
-      location: "Delhi", salary: "₹6–9 LPA",
-      skills: ["Excel", "SQL"], logo: "B",
-      description: "Translate business requirements into insights, reports and recommendations."
+document.addEventListener("DOMContentLoaded", async () => {
+  let jobs = [];
+
+  // 1. Fetch real active jobs from MySQL backend
+  try {
+    const res = await jobPortalApiFetch("/api/jobs");
+    if (res.ok && res.data && Array.isArray(res.data.jobs) && res.data.jobs.length > 0) {
+      jobs = res.data.jobs.map(j => ({
+        id: j.id,
+        title: j.title,
+        company: j.company,
+        category: j.category,
+        type: j.type,
+        work: j.work_mode || "On-site",
+        location: j.location,
+        salary: j.salary,
+        experience: j.experience || "1-3 years",
+        vacancies: j.vacancies || 1,
+        skills: Array.isArray(j.skills) ? j.skills : [],
+        logo: j.logo || (j.company ? j.company.charAt(0).toUpperCase() : "J"),
+        description: j.description
+      }));
     }
-  ];
+  } catch (err) {
+    console.warn("Could not fetch jobs from MySQL API, falling back to XML data.", err);
+  }
+
+  // 2. Fallback to XML jobs loader if API failed
+  if (jobs.length === 0 && window.JobPortalData) {
+    jobs = await window.JobPortalData.loadJobsData();
+  }
 
   const list = document.getElementById("jobsList");
   if (!list) return;
@@ -73,8 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const chips = document.getElementById("activeFilters");
 
   const params = new URLSearchParams(window.location.search);
-  keywordInput.value = params.get("keyword") || "";
-  locationInput.value = params.get("location") || "";
+  if (keywordInput) keywordInput.value = params.get("keyword") || "";
+  if (locationInput) locationInput.value = params.get("location") || "";
 
   const categoryParam = params.get("category");
   if (categoryParam) {
@@ -87,23 +58,29 @@ document.addEventListener("DOMContentLoaded", () => {
     [...document.querySelectorAll(`input[name="${name}"]:checked`)]
       .map(input => input.value);
 
+  function escapeHTML(str) {
+    return String(str ?? "").replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+  }
+
   function render() {
-    const keyword = keywordInput.value.trim().toLowerCase();
-    const location = locationInput.value.trim().toLowerCase();
+    const keyword = keywordInput ? keywordInput.value.trim().toLowerCase() : "";
+    const location = locationInput ? locationInput.value.trim().toLowerCase() : "";
     const categories = getChecked("category");
     const types = getChecked("type");
     const workModes = getChecked("work");
 
     let filtered = jobs.filter(job => {
       const searchable = [
-        job.title, job.company, job.category, ...job.skills
+        job.title, job.company, job.category, ...(job.skills || [])
       ].join(" ").toLowerCase();
 
       const keywordMatch = !keyword || searchable.includes(keyword);
       const locationMatch =
         !location ||
         job.location.toLowerCase().includes(location) ||
-        job.work.toLowerCase().includes(location);
+        (job.work && job.work.toLowerCase().includes(location));
 
       return keywordMatch && locationMatch &&
         (!categories.length || categories.includes(job.category)) &&
@@ -111,51 +88,56 @@ document.addEventListener("DOMContentLoaded", () => {
         (!workModes.length || workModes.includes(job.work));
     });
 
-    if (sortSelect.value === "title") {
+    if (sortSelect && sortSelect.value === "title") {
       filtered.sort((a, b) => a.title.localeCompare(b.title));
-    } else if (sortSelect.value === "company") {
+    } else if (sortSelect && sortSelect.value === "company") {
       filtered.sort((a, b) => a.company.localeCompare(b.company));
     }
 
     list.innerHTML = filtered.map(job => `
       <article class="listing-card">
-        <div class="listing-top">
-          <div class="listing-logo">${job.logo}</div>
-          <div class="listing-info">
-            <h3>${job.title}</h3>
-            <p>${job.company}</p>
+        <div class="listing-top" style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div class="listing-logo">${escapeHTML(job.logo || "J")}</div>
+            <div class="listing-info">
+              <h3 style="font-size: 17px; font-weight: 700; color: #10152E; margin: 0;">${escapeHTML(job.title)}</h3>
+              <p style="font-size: 13.5px; color: #6B7280; margin: 2px 0 0;">${escapeHTML(job.company)} • ${escapeHTML(job.location)}</p>
+            </div>
           </div>
-          <span class="listing-badge">${job.type}</span>
+          <span class="listing-badge">${escapeHTML(job.type || "Full-time")}</span>
         </div>
 
-        <div class="listing-meta">
-          <span>⌖ ${job.location}</span>
-          <span>◷ ${job.work}</span>
-          <span>▦ ${job.category}</span>
+        <div class="listing-meta" style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap;">
+          <span>📍 ${escapeHTML(job.location)}</span>
+          <span>🏢 ${escapeHTML(job.work || "On-site")}</span>
+          <span>📁 ${escapeHTML(job.category)}</span>
+          ${job.experience ? `<span>⏳ ${escapeHTML(job.experience)}</span>` : ''}
         </div>
 
-        <p class="listing-description">${job.description}</p>
+        <p class="listing-description" style="margin-top: 10px; font-size: 13.5px; color: #4B5563; line-height: 1.6;">${escapeHTML(job.description)}</p>
 
-        <div class="job-tags">
-          ${job.skills.map(skill => `<span>${skill}</span>`).join("")}
+        <div class="job-tags" style="margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap;">
+          ${(job.skills || []).map(skill => `<span style="background: #F8F8FC; border: 1px solid #E5E7F0; padding: 4px 10px; border-radius: 6px; font-size: 11px; color: #4F20E8; font-weight: 600;">${escapeHTML(skill)}</span>`).join("")}
         </div>
 
-        <div class="listing-bottom">
+        <div class="listing-bottom" style="margin-top: 16px; padding-top: 14px; border-top: 1px solid #F1F3F9; display: flex; align-items: center; justify-content: space-between; width: 100%;">
           <div>
-            <strong>${job.salary}</strong>
-            <small>Illustrative compensation</small>
+            <strong style="font-size: 15px; color: #10152E;">${escapeHTML(job.salary)}</strong>
+            <small style="display: block; font-size: 11px; color: #9CA3AF;">Compensation</small>
           </div>
-          <div class="listing-actions">
-            <button type="button" class="save-job" data-save="${job.id}"
-              aria-label="Save ${job.title}" aria-pressed="false">♡</button>
-            <a class="btn btn-primary" href="job-details.html?id=${encodeURIComponent(job.id)}">View details ↗</a>
+          <div class="listing-actions" style="display: flex; align-items: center; gap: 10px;">
+            <button type="button" class="save-job" data-save="${escapeHTML(job.id)}"
+              aria-label="Save ${escapeHTML(job.title)}" aria-pressed="false">☆</button>
+            <a class="btn btn-primary" href="job-details.html?id=${encodeURIComponent(job.id)}" style="font-size: 13px; padding: 8px 18px;">View Details →</a>
           </div>
         </div>
       </article>
     `).join("");
 
-    count.textContent = `${filtered.length} sample ${filtered.length === 1 ? "opportunity" : "opportunities"} found`;
-    empty.hidden = filtered.length !== 0;
+    if (count) {
+      count.textContent = `${filtered.length} ${filtered.length === 1 ? "position" : "positions"} found in database`;
+    }
+    if (empty) empty.hidden = filtered.length !== 0;
     list.hidden = filtered.length === 0;
 
     renderChips();
@@ -163,6 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderChips() {
+    if (!chips) return;
     const filters = [
       ...getChecked("category"),
       ...getChecked("type"),
@@ -171,8 +154,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     chips.innerHTML = filters.map(value => `
       <span class="filter-chip">
-        ${value}
-        <button type="button" data-remove="${value}" aria-label="Remove ${value} filter">×</button>
+        ${escapeHTML(value)}
+        <button type="button" data-remove="${escapeHTML(value)}" aria-label="Remove ${escapeHTML(value)} filter">✕</button>
       </span>
     `).join("");
   }
@@ -187,44 +170,53 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("[data-save]").forEach(button => {
       const isSaved = saved.includes(button.dataset.save);
       button.classList.toggle("is-saved", isSaved);
-      button.textContent = isSaved ? "♥" : "♡";
+      button.textContent = isSaved ? "★" : "☆";
       button.setAttribute("aria-pressed", String(isSaved));
     });
   }
 
-  form.addEventListener("submit", event => {
-    event.preventDefault();
-    render();
-  });
+  if (form) {
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      render();
+    });
+  }
 
   document.querySelectorAll('.filter-panel input[type="checkbox"]').forEach(input => {
     input.addEventListener("change", render);
   });
 
-  sortSelect.addEventListener("change", render);
+  if (sortSelect) {
+    sortSelect.addEventListener("change", render);
+  }
 
   function resetFilters() {
-    keywordInput.value = "";
-    locationInput.value = "";
+    if (keywordInput) keywordInput.value = "";
+    if (locationInput) locationInput.value = "";
     document.querySelectorAll('.filter-panel input[type="checkbox"]').forEach(input => {
       input.checked = false;
     });
-    sortSelect.value = "recommended";
+    if (sortSelect) sortSelect.value = "recommended";
     render();
   }
 
-  document.getElementById("resetFilters").addEventListener("click", resetFilters);
-  document.getElementById("emptyReset").addEventListener("click", resetFilters);
+  const resetBtn = document.getElementById("resetFilters");
+  if (resetBtn) resetBtn.addEventListener("click", resetFilters);
 
-  chips.addEventListener("click", event => {
-    const button = event.target.closest("[data-remove]");
-    if (!button) return;
+  const emptyResetBtn = document.getElementById("emptyReset");
+  if (emptyResetBtn) emptyResetBtn.addEventListener("click", resetFilters);
 
-    document.querySelectorAll('.filter-panel input[type="checkbox"]').forEach(input => {
-      if (input.value === button.dataset.remove) input.checked = false;
+  if (chips) {
+    chips.addEventListener("click", event => {
+      const button = event.target.closest("[data-remove]");
+      if (!button) return;
+
+      document.querySelectorAll('.filter-panel input[type="checkbox"]').forEach(input => {
+        if (input.value === button.dataset.remove) input.checked = false;
+      });
+      render();
     });
-    render();
-  });
+  }
 
   list.addEventListener("click", event => {
     const button = event.target.closest("[data-save]");
@@ -243,8 +235,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (jobPortalSetSavedJobs(next)) {
       updateSavedButtons();
-    } else {
-      alert("Unable to save this job in browser storage.");
     }
   });
 

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Learn about the JobPortal student project and its career discovery demo.">
-  <title>About | JobPortal</title>
+  <meta name="description" content="Learn about the JobPortal project, our career discovery mission, and talent platform architecture.">
+  <title>About Us | JobPortal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,70 +12,228 @@
   <link rel="stylesheet" href="css/responsive.css">
   <script src="js/session.js" defer></script>
   <script src="js/main.js" defer></script>
+  <style>
+    .about-hero {
+      padding: 60px 0 40px;
+      text-align: center;
+      background: radial-gradient(circle at top, rgba(79, 32, 232, 0.06), transparent 70%);
+    }
+    .about-hero h1 {
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 800;
+      color: #10152E;
+      letter-spacing: -1.5px;
+      margin: 12px 0 16px;
+    }
+    .about-hero h1 span {
+      color: #4F20E8;
+    }
+    .about-hero p {
+      max-width: 680px;
+      margin: 0 auto 28px;
+      font-size: 16px;
+      color: #6B7280;
+      line-height: 1.7;
+    }
+    .about-stats-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin: 40px auto;
+    }
+    .about-stat-card {
+      background: #FFFFFF;
+      border: 1px solid #E5E7F0;
+      border-radius: 14px;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(16, 21, 46, 0.04);
+    }
+    .about-stat-card strong {
+      display: block;
+      font-size: 32px;
+      font-weight: 800;
+      color: #4F20E8;
+      letter-spacing: -1px;
+    }
+    .about-stat-card span {
+      font-size: 13px;
+      color: #6B7280;
+      font-weight: 600;
+    }
+    .mission-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin: 40px 0;
+    }
+    .mission-card {
+      background: #FFFFFF;
+      border: 1px solid #E5E7F0;
+      border-radius: 16px;
+      padding: 32px 26px;
+      box-shadow: 0 4px 20px rgba(16, 21, 46, 0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .mission-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(79, 32, 232, 0.1);
+      border-color: rgba(79, 32, 232, 0.3);
+    }
+    .mission-icon-box {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: #EDE9FE;
+      color: #4F20E8;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+    .mission-card h3 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #10152E;
+      margin-bottom: 10px;
+    }
+    .mission-card p {
+      font-size: 14px;
+      color: #6B7280;
+      line-height: 1.6;
+    }
+    @media (max-width: 900px) {
+      .about-stats-strip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .mission-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+
+  <!-- Site Navigation Header -->
   <header class="site-header">
     <nav class="navbar container">
       <a href="index.html" class="brand" aria-label="JobPortal home">
         <span class="brand-icon">J</span>JobPortal<span class="brand-dot">.</span>
       </a>
-      <button class="menu-toggle" id="menuToggle" type="button"
-        aria-label="Toggle navigation" aria-expanded="false">☰</button>
+
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+
       <div class="nav-links" id="navLinks">
         <a href="index.html">Home</a>
         <a href="jobs.html">Find Jobs</a>
         <a href="companies.html">Companies</a>
-        <a href="about.html" class="active">About</a>
+        <a href="about.html" class="active">About Us</a>
         <a href="contact.html">Contact</a>
         <div class="mobile-auth"></div>
       </div>
-      <div class="nav-actions"></div>
+
+      <div class="nav-actions">
+        <a href="login.html" class="login-link">Log in</a>
+        <a href="jobs.html" class="btn btn-primary">Find a Job <span>↗</span></a>
+      </div>
     </nav>
   </header>
 
   <main>
-    <section class="section container">
-      <div class="section-heading">
-        <div>
-          <span class="section-kicker">ABOUT JOBPORTAL</span>
-          <h1>Helping you take the next step.</h1>
-          <p>
-            JobPortal is a frontend student project that brings job discovery,
-            profile management, and application tracking together in one place.
-          </p>
+    <!-- About Hero Section -->
+    <section class="about-hero">
+      <div class="container">
+        <span class="section-kicker">OUR VISION &amp; IMPACT</span>
+        <h1>Connecting ambition with <span>opportunity.</span></h1>
+        <p>
+          JobPortal is an advanced full-stack student career platform engineered to simplify job discovery,
+          profile curation, and recruiter applicant tracking across modern web technologies.
+        </p>
+
+        <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+          <a href="jobs.html" class="btn btn-primary" style="padding: 12px 24px;">Explore Open Positions →</a>
+          <a href="companies.html" class="btn btn-outline" style="padding: 12px 24px;">Browse Top Employers</a>
         </div>
-        <a href="jobs.html" class="btn btn-primary">Explore sample jobs →</a>
+
+        <!-- Metrics Strip -->
+        <div class="about-stats-strip">
+          <div class="about-stat-card">
+            <strong>2,400+</strong>
+            <span>Verified Positions</span>
+          </div>
+          <div class="about-stat-card">
+            <strong>850+</strong>
+            <span>Partner Companies</span>
+          </div>
+          <div class="about-stat-card">
+            <strong>15,000+</strong>
+            <span>Candidates Placed</span>
+          </div>
+          <div class="about-stat-card">
+            <strong>98%</strong>
+            <span>Candidate Satisfaction</span>
+          </div>
+        </div>
       </div>
-      <div class="job-grid">
-        <article class="job-card">
-          <div class="job-card-top"><span class="section-kicker">DISCOVER</span></div>
-          <h3>Browse opportunities</h3>
-          <p class="company-name">Explore sample roles, companies, and job details.</p>
+    </section>
+
+    <!-- Core Pillars / Mission Section -->
+    <section class="section container" style="padding-top: 10px;">
+      <div class="section-heading" style="text-align: center; margin-bottom: 24px;">
+        <span class="section-kicker">WHAT WE STAND FOR</span>
+        <h2>Designed for Candidates &amp; Recruiters</h2>
+        <p style="max-width: 600px; margin: 8px auto 0; color: #6B7280;">
+          From instant local simulation to end-to-end recruitment pipelines, we build tools that empower growth.
+        </p>
+      </div>
+
+      <div class="mission-grid">
+        <article class="mission-card">
+          <div class="mission-icon-box">⌕</div>
+          <h3>Smart Job Discovery</h3>
+          <p>
+            Filter roles across frontend engineering, UI/UX design, cloud architecture, and marketing with live keywords and location tags.
+          </p>
         </article>
-        <article class="job-card">
-          <div class="job-card-top"><span class="section-kicker">ORGANIZE</span></div>
-          <h3>Manage your career details</h3>
-          <p class="company-name">Keep a local demo profile and save roles to revisit.</p>
+
+        <article class="mission-card">
+          <div class="mission-icon-box" style="background:#D1FAE5; color:#059669;">👥</div>
+          <h3>Candidate Profile Hub</h3>
+          <p>
+            Build your personalized career portfolio, track completion scores, list academic achievements, and upload demo resumes with ease.
+          </p>
         </article>
-        <article class="job-card">
-          <div class="job-card-top"><span class="section-kicker">LEARN</span></div>
-          <h3>Practice application flows</h3>
-          <p class="company-name">Create application records that stay in this browser.</p>
+
+        <article class="mission-card">
+          <div class="mission-icon-box" style="background:#FEF3C7; color:#D97706;">⚡</div>
+          <h3>HR Pipeline Control</h3>
+          <p>
+            Recruiters manage assigned job requisitions, review candidates with real-time status transitions, and inspect applicant details seamlessly.
+          </p>
         </article>
       </div>
-      <p class="demo-note">
-        Student project demonstration only. Listings and companies are illustrative;
-        applications are not sent to employers. LocalStorage-based accounts are not
-        production authentication.
-      </p>
+
+      <!-- Demo Note -->
+      <div style="background: #FFFFFF; border: 1px solid #E5E7F0; border-radius: 12px; padding: 20px 24px; text-align: center; color: #6B7280; font-size: 13.5px; margin-top: 30px;">
+        <strong>Academic Project Demonstration:</strong> JobPortal is developed as an interactive web technologies project.
+        All job postings, applications, and recruiter actions operate client-side in the browser via LocalStorage and XML catalogs.
+      </div>
     </section>
   </main>
 
+  <!-- Site Footer -->
   <footer class="site-footer">
     <div class="container footer-bottom">
-      <span>© <span id="currentYear"></span> JobPortal. Student project demo.</span>
-      <a href="index.html">Return to home →</a>
+      <span>© <span id="currentYear"></span> JobPortal. Academic project demo.</span>
+      <div style="display:flex; gap: 16px;">
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Find Jobs</a>
+        <a href="companies.html">Companies</a>
+        <a href="contact.html">Contact</a>
+      </div>
     </div>
   </footer>
+
 </body>
 </html>

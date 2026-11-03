@@ -1,4 +1,3 @@
-
 "use strict";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -28,8 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
     homeSearch.addEventListener("submit", (event) => {
       event.preventDefault();
 
-      const keyword = document.getElementById("homeKeyword").value.trim();
-      const location = document.getElementById("homeLocation").value.trim();
+      const keyword = document.getElementById("homeKeyword") ? document.getElementById("homeKeyword").value.trim() : "";
+      const location = document.getElementById("homeLocation") ? document.getElementById("homeLocation").value.trim() : "";
 
       const params = new URLSearchParams();
 
@@ -45,5 +44,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (yearElement) {
     yearElement.textContent = new Date().getFullYear();
+  }
+
+  // Load featured jobs dynamically from MySQL (or fallback to XML catalog)
+  const featuredJobsContainer = document.getElementById("featuredJobs");
+  if (featuredJobsContainer) {
+    fetch("/api/jobs")
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.jobs && data.jobs.length > 0) {
+          renderFeatured(data.jobs.slice(0, 3));
+        } else if (window.JobPortalData) {
+          window.JobPortalData.loadJobsData().then(jobs => renderFeatured(jobs.slice(0, 3)));
+        }
+      })
+      .catch(() => {
+        if (window.JobPortalData) {
+          window.JobPortalData.loadJobsData().then(jobs => renderFeatured(jobs.slice(0, 3)));
+        }
+      });
+
+    function renderFeatured(jobs) {
+      if (!jobs || !jobs.length) return;
+      featuredJobsContainer.innerHTML = jobs.map(job => `
+        <article class="job-card">
+          <div class="job-card-top">
+            <div class="company-logo">${job.logo || (job.company ? job.company.charAt(0).toUpperCase() : "J")}</div>
+            <span class="job-type ${job.type === 'Internship' ? 'job-type-intern' : ''}">${job.type || 'Full-time'}</span>
+          </div>
+          <h3>${job.title}</h3>
+          <p class="company-name">${job.company} • ${job.location}</p>
+          <div class="job-tags">
+            ${(job.skills || []).slice(0, 2).map(s => `<span>${s}</span>`).join("")}
+          </div>
+          <div class="job-card-bottom">
+            <div><strong>${job.salary}</strong><small>Compensation</small></div>
+            <a href="job-details.html?id=${encodeURIComponent(job.id)}" class="apply-arrow" aria-label="View ${job.title}">→</a>
+          </div>
+        </article>
+      `).join("");
+    }
   }
 });
