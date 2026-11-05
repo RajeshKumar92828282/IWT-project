@@ -4,7 +4,8 @@ const JOBPORTAL_KEYS = Object.freeze({
   session: "jobportal_user",
   accounts: "jobportal_demo_accounts",
   applications: "jobportal_applications",
-  savedJobs: "jobportal_saved_jobs"
+  savedJobs: "jobportal_saved_jobs",
+  customJobs: "jobportal_custom_jobs"
 });
 
 const JOBPORTAL_JOB_IDS = Object.freeze([
@@ -200,13 +201,6 @@ function jobPortalUpdateApplicationStatus(applicationId, newStatus, note = "") {
 
   records[appIndex] = app;
   const saved = jobPortalWriteJSON(JOBPORTAL_KEYS.applications, records);
-
-  // Async sync with MySQL backend if connected
-  jobPortalApiFetch(`/api/applications/${applicationId}/status`, {
-    method: "PATCH",
-    body: JSON.stringify({ status: sanitizedStatus, note })
-  }).catch(() => {});
-
   return saved ? { ok: true, application: app } : { ok: false, reason: "save_failed" };
 }
 
@@ -224,6 +218,172 @@ function jobPortalSetSavedJobs(jobIds, user = jobPortalGetSession()) {
   const userKey = user.email.trim().toLowerCase();
   store[userKey] = Array.isArray(jobIds) ? [...new Set(jobIds)] : [];
   return jobPortalWriteJSON(JOBPORTAL_KEYS.savedJobs, store);
+}
+
+function jobPortalGetCustomJobs() {
+  const jobs = jobPortalReadJSON(JOBPORTAL_KEYS.customJobs, []);
+  return Array.isArray(jobs) ? jobs : [];
+}
+
+function jobPortalSaveCustomJob(job) {
+  const jobs = jobPortalGetCustomJobs();
+  const newJob = {
+    ...job,
+    id: job.id || `job_${Date.now()}`,
+    postedDate: job.postedDate || new Date().toISOString().split("T")[0],
+    is_active: job.is_active !== undefined ? job.is_active : 1,
+    applicants_count: job.applicants_count || 0
+  };
+  jobs.unshift(newJob);
+  jobPortalWriteJSON(JOBPORTAL_KEYS.customJobs, jobs);
+  return newJob;
+}
+
+function jobPortalUpdateCustomJob(jobId, jobData) {
+  const jobs = jobPortalGetCustomJobs();
+  const index = jobs.findIndex(j => j.id === jobId);
+  if (index !== -1) {
+    jobs[index] = { ...jobs[index], ...jobData };
+    jobPortalWriteJSON(JOBPORTAL_KEYS.customJobs, jobs);
+    return jobs[index];
+  }
+  return null;
+}
+
+function jobPortalDeleteCustomJob(jobId) {
+  const jobs = jobPortalGetCustomJobs();
+  const filtered = jobs.filter(j => j.id !== jobId);
+  jobPortalWriteJSON(JOBPORTAL_KEYS.customJobs, filtered);
+  return true;
+}
+
+async function jobPortalGetAllJobs() {
+  let xmlJobs = [];
+  if (window.JobPortalData && typeof window.JobPortalData.loadJobsData === "function") {
+    try {
+      xmlJobs = await window.JobPortalData.loadJobsData();
+    } catch (e) {
+      xmlJobs = window.JobPortalData.defaultJobs || [];
+    }
+  }
+  const customJobs = jobPortalGetCustomJobs();
+  return [...customJobs, ...xmlJobs];
+}
+
+function jobPortalSeedDemoData() {
+  // Pre-seed default accounts if not set
+  let accounts = jobPortalReadJSON(JOBPORTAL_KEYS.accounts, null);
+  if (!Array.isArray(accounts) || accounts.length === 0) {
+    accounts = [
+      {
+        id: "user:candidate@example.com",
+        name: "Anjali Verma",
+        email: "candidate@example.com",
+        password: "password",
+        role: "candidate",
+        company: ""
+      },
+      {
+        id: "user:recruiter@example.com",
+        name: "HR Manager",
+        email: "recruiter@example.com",
+        password: "password",
+        role: "recruiter",
+        company: "Google"
+      }
+    ];
+    jobPortalWriteJSON(JOBPORTAL_KEYS.accounts, accounts);
+  }
+
+  // Pre-seed sample applications if not set
+  let applications = jobPortalReadJSON(JOBPORTAL_KEYS.applications, null);
+  if (!Array.isArray(applications) || applications.length === 0) {
+    applications = [
+      {
+        id: "APP-102941",
+        userId: "user:candidate@example.com",
+        jobId: "frontend",
+        jobTitle: "Frontend Developer",
+        company: "Google",
+        recruiterId: "recruiter@example.com",
+        applicantName: "Anjali Verma",
+        email: "candidate@example.com",
+        phone: "+91 98765 43210",
+        location: "Bengaluru, India",
+        resumeName: "Anjali_Verma_Resume.pdf",
+        resumeSize: "1.2 MB",
+        coverLetter: "I am passionate about creating accessible, responsive UI with modern JavaScript and HTML5/CSS3.",
+        status: "Shortlisted",
+        submittedAt: "2026-11-01T10:30:00Z",
+        statusHistory: [
+          { status: "Pending", date: "2026-11-01T10:30:00Z", note: "Application submitted" },
+          { status: "Shortlisted", date: "2026-11-02T14:15:00Z", note: "Profile shortlisted for technical interview" }
+        ]
+      },
+      {
+        id: "APP-102942",
+        userId: "user:candidate@example.com",
+        jobId: "designer",
+        jobTitle: "UI/UX Designer",
+        company: "Design Studio",
+        recruiterId: "recruiter@example.com",
+        applicantName: "Anjali Verma",
+        email: "candidate@example.com",
+        phone: "+91 98765 43210",
+        location: "Bengaluru, India",
+        resumeName: "Anjali_Design_Portfolio.pdf",
+        resumeSize: "2.4 MB",
+        coverLetter: "Experienced in Figma design systems and user research.",
+        status: "Pending",
+        submittedAt: "2026-11-02T11:00:00Z",
+        statusHistory: [
+          { status: "Pending", date: "2026-11-02T11:00:00Z", note: "Application submitted" }
+        ]
+      },
+      {
+        id: "APP-102943",
+        userId: "user:rohan@example.com",
+        jobId: "frontend",
+        jobTitle: "Frontend Developer",
+        company: "Google",
+        recruiterId: "recruiter@example.com",
+        applicantName: "Rohan Patil",
+        email: "rohan@example.com",
+        phone: "+91 98220 11223",
+        location: "Pune, India",
+        resumeName: "Rohan_Patil_CV.pdf",
+        resumeSize: "850 KB",
+        coverLetter: "Front-end enthusiast with hands-on JavaScript experience.",
+        status: "Shortlisted",
+        submittedAt: "2026-11-03T09:20:00Z",
+        statusHistory: [
+          { status: "Pending", date: "2026-11-03T09:20:00Z", note: "Applied" },
+          { status: "Shortlisted", date: "2026-11-03T16:00:00Z", note: "Shortlisted by HR" }
+        ]
+      },
+      {
+        id: "APP-102944",
+        userId: "user:priya@example.com",
+        jobId: "frontend",
+        jobTitle: "Frontend Developer",
+        company: "Google",
+        recruiterId: "recruiter@example.com",
+        applicantName: "Priya Sharma",
+        email: "priya@example.com",
+        phone: "+91 99330 44556",
+        location: "Mumbai, India",
+        resumeName: "Priya_Sharma_Resume.pdf",
+        resumeSize: "1.1 MB",
+        coverLetter: "Strong problem solver and team player.",
+        status: "Pending",
+        submittedAt: "2026-11-04T12:00:00Z",
+        statusHistory: [
+          { status: "Pending", date: "2026-11-04T12:00:00Z", note: "Applied" }
+        ]
+      }
+    ];
+    jobPortalWriteJSON(JOBPORTAL_KEYS.applications, applications);
+  }
 }
 
 function jobPortalSaveApplication(application, user = jobPortalGetSession()) {
@@ -264,12 +424,6 @@ function jobPortalSaveApplication(application, user = jobPortalGetSession()) {
 
   records.unshift(newApp);
   const saved = jobPortalWriteJSON(JOBPORTAL_KEYS.applications, records);
-
-  // Sync to MySQL backend asynchronously
-  jobPortalApiFetch("/api/applications", {
-    method: "POST",
-    body: JSON.stringify(newApp)
-  }).catch(() => {});
 
   return saved
     ? { ok: true, application: newApp }
@@ -435,6 +589,7 @@ document.addEventListener("click", event => {
 
 // Setup navigation on DOM load
 document.addEventListener("DOMContentLoaded", () => {
+  jobPortalSeedDemoData();
   jobPortalUpdateNavigation();
 
   const page = window.location.pathname.split("/").pop().toLowerCase();

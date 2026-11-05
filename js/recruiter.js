@@ -102,41 +102,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (rejectedEl) rejectedEl.textContent = rejectedCount;
   }
 
-  // Load Recruiter's Jobs from MySQL
+  // Load Recruiter's Jobs
   async function loadRecruiterJobs() {
     try {
-      const res = await jobPortalApiFetch("/api/recruiter/jobs");
-      if (res.ok && res.data && res.data.jobs) {
-        managedJobsCache = res.data.jobs;
-      } else {
-        // Fallback to local jobs
-        const defaultJobs = window.JobPortalData ? await window.JobPortalData.loadJobsData() : [];
-        managedJobsCache = defaultJobs.filter(j => 
-          !j.recruiterId || j.recruiterId.toLowerCase() === session.email.toLowerCase() ||
-          (session.company && j.company && j.company.toLowerCase() === session.company.toLowerCase())
-        );
-      }
+      const allJobs = await jobPortalGetAllJobs();
+      managedJobsCache = allJobs.filter(j => 
+        !j.recruiterId || j.recruiterId.toLowerCase() === session.email.toLowerCase() ||
+        (session.company && j.company && j.company.toLowerCase() === session.company.toLowerCase())
+      );
     } catch (e) {
-      console.warn("Could not load jobs from API, using local fallback.", e);
+      console.warn("Could not load jobs, using local fallback.", e);
+      const defaultJobs = window.JobPortalData ? await window.JobPortalData.loadJobsData() : [];
+      managedJobsCache = defaultJobs.filter(j => 
+        !j.recruiterId || j.recruiterId.toLowerCase() === session.email.toLowerCase() ||
+        (session.company && j.company && j.company.toLowerCase() === session.company.toLowerCase())
+      );
     }
 
     renderManagedJobs();
     populateJobFilter();
   }
 
-  // Load Applications from MySQL
-  async function loadRecruiterApplications() {
-    try {
-      const res = await jobPortalApiFetch("/api/recruiter/applications");
-      if (res.ok && res.data && res.data.applications) {
-        applicationsCache = res.data.applications;
-      } else {
-        applicationsCache = jobPortalGetRecruiterApplications(session);
-      }
-    } catch (e) {
-      applicationsCache = jobPortalGetRecruiterApplications(session);
-    }
-
+  // Load Applications
+  function loadRecruiterApplications() {
+    applicationsCache = jobPortalGetRecruiterApplications(session);
     renderTable();
   }
 
@@ -308,7 +297,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Handle Status Change via Dropdown
   if (applicationsTableBody) {
-    applicationsTableBody.addEventListener("change", async (e) => {
+    applicationsTableBody.addEventListener("change", (e) => {
       const target = e.target;
       if (!target || target.dataset.action !== "status") return;
 
@@ -316,19 +305,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       const newStatus = target.value;
       target.disabled = true;
 
-      // Update in MySQL
-      const res = await jobPortalApiFetch(`/api/applications/${appId}/status`, {
-        method: "PATCH",
-        body: JSON.stringify({ status: newStatus, note: `Status updated to ${newStatus} by ${session.name}` })
-      });
-
       // Update in local cache and LocalStorage
       jobPortalUpdateApplicationStatus(appId, newStatus, `Status updated to ${newStatus}`);
       const app = applicationsCache.find(a => a.id === appId);
       if (app) app.status = newStatus;
 
       target.disabled = false;
-      showToast(`Candidate status updated to "${newStatus}" in MySQL.`);
+      showToast(`Candidate status updated to "${newStatus}".`);
       renderTable();
     });
 
@@ -478,22 +461,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       };
 
       postJobSubmitBtn.disabled = true;
-      postJobSubmitBtn.textContent = "Saving to MySQL...";
+      postJobSubmitBtn.textContent = "Saving Job...";
 
       if (editId) {
-        // Edit existing job in MySQL
-        const res = await jobPortalApiFetch(`/api/jobs/${editId}`, {
-          method: "PUT",
-          body: JSON.stringify(jobData)
-        });
-        showToast(res.ok ? "Job updated successfully in MySQL!" : "Could not update job.");
+        // Edit existing job in LocalStorage
+        jobPortalUpdateCustomJob(editId, jobData);
+        showToast("Job updated successfully!");
       } else {
-        // Create new job in MySQL
-        const res = await jobPortalApiFetch("/api/jobs", {
-          method: "POST",
-          body: JSON.stringify(jobData)
-        });
-        showToast(res.ok ? "Job published successfully in MySQL!" : "Could not post job.");
+        // Create new job in LocalStorage
+        jobPortalSaveCustomJob(jobData);
+        showToast("Job published successfully!");
       }
 
       postJobSubmitBtn.disabled = false;
@@ -534,16 +511,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const currentlyActive = toggleBtn.dataset.active === "1";
         const newActiveState = currentlyActive ? 0 : 1;
 
-        toggleBtn.disabled = true;
-        const res = await jobPortalApiFetch(`/api/jobs/${jobId}/status`, {
-          method: "PATCH",
-          body: JSON.stringify({ is_active: newActiveState })
-        });
-
-        showToast(res.ok 
-          ? `Job status changed to ${newActiveState ? 'Active' : 'Closed'}.`
-          : "Could not update job status."
-        );
+        jobPortalUpdateCustomJob(jobId, { is_active: newActiveState });
+        showToast(`Job status changed to ${newActiveState ? 'Active' : 'Closed'}.`);
         await loadRecruiterJobs();
         return;
       }
@@ -556,12 +525,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           return;
         }
 
-        deleteBtn.disabled = true;
-        const res = await jobPortalApiFetch(`/api/jobs/${jobId}`, {
-          method: "DELETE"
-        });
-
-        showToast(res.ok ? "Job listing deleted from MySQL." : "Could not delete job.");
+        jobPortalDeleteCustomJob(jobId);
+        showToast("Job listing deleted.");
         await loadRecruiterJobs();
         return;
       }

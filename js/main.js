@@ -46,23 +46,24 @@ document.addEventListener("DOMContentLoaded", () => {
     yearElement.textContent = new Date().getFullYear();
   }
 
-  // Load featured jobs dynamically from MySQL (or fallback to XML catalog)
+  // Load featured jobs dynamically from XML catalog & custom jobs
   const featuredJobsContainer = document.getElementById("featuredJobs");
   if (featuredJobsContainer) {
-    fetch("/api/jobs")
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.jobs && data.jobs.length > 0) {
-          renderFeatured(data.jobs.slice(0, 3));
+    (async () => {
+      let jobs = [];
+      try {
+        if (typeof jobPortalGetAllJobs === "function") {
+          jobs = await jobPortalGetAllJobs();
         } else if (window.JobPortalData) {
-          window.JobPortalData.loadJobsData().then(jobs => renderFeatured(jobs.slice(0, 3)));
+          jobs = await window.JobPortalData.loadJobsData();
         }
-      })
-      .catch(() => {
+      } catch (e) {
         if (window.JobPortalData) {
-          window.JobPortalData.loadJobsData().then(jobs => renderFeatured(jobs.slice(0, 3)));
+          jobs = await window.JobPortalData.loadJobsData();
         }
-      });
+      }
+      renderFeatured((jobs || []).slice(0, 3));
+    })();
 
     function renderFeatured(jobs) {
       if (!jobs || !jobs.length) return;

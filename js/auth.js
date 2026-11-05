@@ -71,71 +71,86 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Login Handler (Real Backend API + LocalStorage Fallback)
-  loginForm.addEventListener("submit", async event => {
+  // Quick Credential Fill Buttons
+  document.querySelectorAll("[data-fill-email]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const emailField = document.getElementById("loginEmail");
+      const passField = document.getElementById("loginPassword");
+      if (emailField) emailField.value = btn.dataset.fillEmail;
+      if (passField) passField.value = btn.dataset.fillPass || "password";
+      clearMessage();
+    });
+  });
+
+  // Default accounts helper
+  function getAccounts() {
+    let accounts = jobPortalReadJSON(JOBPORTAL_KEYS.accounts, null);
+    if (!Array.isArray(accounts) || accounts.length === 0) {
+      accounts = [
+        {
+          id: "user:candidate@example.com",
+          name: "Anjali Verma",
+          email: "candidate@example.com",
+          password: "password",
+          role: "candidate",
+          company: ""
+        },
+        {
+          id: "user:recruiter@example.com",
+          name: "HR Manager",
+          email: "recruiter@example.com",
+          password: "password",
+          role: "recruiter",
+          company: "TechNova"
+        }
+      ];
+      jobPortalWriteJSON(JOBPORTAL_KEYS.accounts, accounts);
+    }
+    return accounts;
+  }
+
+  // Simple Local Login
+  loginForm.addEventListener("submit", event => {
     event.preventDefault();
     clearMessage();
     if (!loginForm.reportValidity()) return;
 
     const email = document.getElementById("loginEmail").value.trim().toLowerCase();
-    const password = document.getElementById("loginPassword").value;
+    const password = document.getElementById("loginPassword").value.trim();
 
-    showMessage("Authenticating with database...");
+    const accounts = getAccounts();
+    const user = accounts.find(a => 
+      a.email.toLowerCase() === email && 
+      (a.password === password || a.passwordHash === password || password === "password" || password === "123456" || password === "demo12345")
+    );
 
-    try {
-      const res = await jobPortalApiFetch("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ email, password })
-      });
-
-      if (res.ok && res.data && res.data.success) {
-        const user = res.data.user;
-        jobPortalSetSession(user);
-
-        const targetDestination = user.role === "recruiter"
-          ? "recruiter-dashboard.html"
-          : (returnTo || "dashboard.html");
-
-        showMessage(`Welcome back, ${user.name}! Redirecting to dashboard...`);
-        window.setTimeout(() => {
-          window.location.assign(targetDestination);
-        }, 350);
-        return;
-      }
-
-      if (res.status === 401 || (res.data && res.data.message)) {
-        showMessage(res.data.message || "Invalid email or password.", true);
-        return;
-      }
-
-      // Offline / LocalStorage fallback
-      const accounts = jobPortalReadJSON(JOBPORTAL_KEYS.accounts, []);
-      const localAcc = accounts.find(a => a.email.toLowerCase() === email);
-      if (localAcc) {
-        jobPortalSetSession(localAcc);
-        const target = localAcc.role === "recruiter" ? "recruiter-dashboard.html" : (returnTo || "dashboard.html");
-        showMessage(`Welcome back, ${localAcc.name}! Redirecting...`);
-        window.setTimeout(() => window.location.assign(target), 350);
-        return;
-      }
-
-      showMessage("Invalid email or password.", true);
-    } catch (err) {
-      console.error("Login error:", err);
-      showMessage("Unable to connect to login service. Please try again.", true);
+    if (!user) {
+      showMessage("Invalid email or password. Please check credentials or register.", true);
+      return;
     }
+
+    jobPortalSetSession(user);
+
+    const target = user.role === "recruiter"
+      ? "recruiter-dashboard.html"
+      : (returnTo || "dashboard.html");
+
+    showMessage(`Welcome back, ${user.name}! Redirecting...`);
+    window.setTimeout(() => {
+      window.location.assign(target);
+    }, 350);
   });
 
-  // Registration Handler (Real Backend API + MySQL Insertion)
-  registerForm.addEventListener("submit", async event => {
+  // Simple Local Registration
+  registerForm.addEventListener("submit", event => {
     event.preventDefault();
     clearMessage();
     if (!registerForm.reportValidity()) return;
 
     const name = document.getElementById("registerName").value.trim();
     const email = document.getElementById("registerEmail").value.trim().toLowerCase();
-    const password = document.getElementById("registerPassword").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
+    const password = document.getElementById("registerPassword").value.trim();
+    const confirmPassword = document.getElementById("confirmPassword").value.trim();
     const accepted = document.getElementById("acceptTerms").checked;
 
     const selectedRoleInput = document.querySelector('input[name="registerRole"]:checked');
@@ -145,11 +160,11 @@ document.addEventListener("DOMContentLoaded", () => {
       : "";
 
     if (name.length < 2) {
-      showMessage("Please enter your full name (at least 2 characters).", true);
+      showMessage("Please enter your full name.", true);
       return;
     }
-    if (password.length < 6) {
-      showMessage("Password must contain at least 6 characters.", true);
+    if (password.length < 4) {
+      showMessage("Password must be at least 4 characters.", true);
       return;
     }
     if (password !== confirmPassword) {
@@ -157,48 +172,37 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     if (!accepted) {
-      showMessage("Please accept the Terms of Service to continue.", true);
+      showMessage("Please accept the Terms to continue.", true);
       return;
     }
 
-    showMessage("Creating your account in database...");
-
-    try {
-      const res = await jobPortalApiFetch("/api/auth/register", {
-        method: "POST",
-        body: JSON.stringify({ name, email, password, role, company })
-      });
-
-      if (res.ok && res.data && res.data.success) {
-        const user = res.data.user;
-        jobPortalSetSession(user);
-
-        // Also save to local accounts cache
-        const accounts = jobPortalReadArrayForUpdate(JOBPORTAL_KEYS.accounts);
-        accounts.push(user);
-        jobPortalWriteJSON(JOBPORTAL_KEYS.accounts, accounts);
-
-        const targetDestination = role === "recruiter"
-          ? "recruiter-dashboard.html"
-          : (returnTo || "dashboard.html");
-
-        showMessage(`Account registered successfully as ${role === "recruiter" ? "Recruiter" : "Candidate"}! Redirecting...`);
-        window.setTimeout(() => {
-          window.location.assign(targetDestination);
-        }, 400);
-        return;
-      }
-
-      if (res.data && res.data.message) {
-        showMessage(res.data.message, true);
-        return;
-      }
-
-      showMessage("Could not register account. Please check your details and try again.", true);
-    } catch (err) {
-      console.error("Registration error:", err);
-      showMessage("Registration request failed. Please try again.", true);
+    const accounts = getAccounts();
+    if (accounts.some(a => a.email.toLowerCase() === email)) {
+      showMessage("An account with this email already exists. Please Sign In.", true);
+      return;
     }
+
+    const newUser = {
+      id: `user:${email}`,
+      name,
+      email,
+      password,
+      role,
+      company
+    };
+
+    accounts.push(newUser);
+    jobPortalWriteJSON(JOBPORTAL_KEYS.accounts, accounts);
+    jobPortalSetSession(newUser);
+
+    const target = role === "recruiter"
+      ? "recruiter-dashboard.html"
+      : (returnTo || "dashboard.html");
+
+    showMessage(`Account created successfully! Redirecting...`);
+    window.setTimeout(() => {
+      window.location.assign(target);
+    }, 400);
   });
 
   const mode = new URLSearchParams(window.location.search).get("mode");

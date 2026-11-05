@@ -28,16 +28,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // Load job details from MySQL
+  // Load job details
   let job = null;
   try {
-    const res = await jobPortalApiFetch(`/api/jobs/${jobId}`);
-    if (res.ok && res.data && res.data.job) {
-      job = res.data.job;
-    }
-  } catch (e) {
-    console.warn("Could not fetch job from API.", e);
-  }
+    const allJobs = await jobPortalGetAllJobs();
+    job = allJobs.find(item => item.id === jobId);
+  } catch (e) {}
 
   if (!job && window.JobPortalData) {
     const xmlJobs = await window.JobPortalData.loadJobsData();
@@ -50,22 +46,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // Check for existing/duplicate application in MySQL
-  let alreadyApplied = false;
-  try {
-    const appRes = await jobPortalApiFetch("/api/candidate/applications");
-    if (appRes.ok && appRes.data && Array.isArray(appRes.data.applications)) {
-      const existing = appRes.data.applications.find(a => (a.job_id || a.jobId) === job.id);
-      if (existing) {
-        alreadyApplied = existing;
-      }
-    }
-  } catch (e) {}
-
-  if (!alreadyApplied) {
-    const localApps = jobPortalGetUserApplications(session);
-    alreadyApplied = localApps.find(a => (a.job_id || a.jobId) === job.id);
-  }
+  // Check for existing/duplicate application
+  const localApps = jobPortalGetUserApplications(session);
+  const alreadyApplied = localApps.find(a => (a.job_id || a.jobId) === job.id);
 
   if (alreadyApplied) {
     const formattedDate = new Date(alreadyApplied.submitted_at || alreadyApplied.submittedAt).toLocaleDateString("en-IN", {
@@ -130,15 +113,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (emailInput) emailInput.value = session.email;
   if (nameInput) nameInput.value = session.name || "";
 
-  // Fetch candidate profile from MySQL
-  try {
-    const profRes = await jobPortalApiFetch("/api/candidate/profile");
-    if (profRes.ok && profRes.data && profRes.data.profile) {
-      const p = profRes.data.profile;
-      if (p.phone && phoneInput) phoneInput.value = p.phone;
-      if (p.location && locationInput) locationInput.value = p.location;
-    }
-  } catch (e) {}
+  // Prefill candidate profile
+  const p = jobPortalGetProfile(session);
+  if (p) {
+    if (p.phone && phoneInput && !phoneInput.value) phoneInput.value = p.phone;
+    if (p.location && locationInput && !locationInput.value) locationInput.value = p.location;
+  }
 
   let selectedFileValidation = null;
 
@@ -221,43 +201,24 @@ document.addEventListener("DOMContentLoaded", async () => {
       const submitBtn = form.querySelector('button[type="submit"]');
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = "Submitting to MySQL...";
+        submitBtn.textContent = "Submitting application...";
       }
 
-      // Submit to MySQL API
-      const appPayload = {
-        job_id: job.id,
-        applicant_name: name,
-        email: email,
-        phone: phone,
-        location: location,
-        resume_name: file.name,
-        resume_size: fileValidation.sizeMB || "1.0 MB",
-        cover_letter: coverLetter
-      };
+      const saveRes = jobPortalSaveApplication({
+        jobId: job.id,
+        jobTitle: job.title,
+        company: job.company,
+        recruiterId: job.recruiterId || job.recruiter_id || "recruiter@example.com",
+        applicantName: name,
+        phone,
+        location,
+        resumeName: file.name,
+        resumeSize: fileValidation.sizeMB || "1.0 MB",
+        coverLetter
+      }, currentUser);
 
-      const res = await jobPortalApiFetch("/api/applications", {
-        method: "POST",
-        body: JSON.stringify(appPayload)
-      });
-
-      if (res.ok && res.data && res.data.success) {
-        // Also save to local storage cache
-        jobPortalSaveApplication({
-          id: res.data.application_id,
-          jobId: job.id,
-          jobTitle: job.title,
-          company: job.company,
-          recruiterId: job.recruiter_id || "recruiter@example.com",
-          applicantName: name,
-          phone,
-          location,
-          resumeName: file.name,
-          resumeSize: fileValidation.sizeMB || "1.0 MB",
-          coverLetter
-        }, currentUser);
-
-        window.location.href = `applications.html?success=${encodeURIComponent(res.data.application_id)}`;
+      if (saveRes && saveRes.ok) {
+        window.location.href = `applications.html?success=${encodeURIComponent(saveRes.application.id)}`;
         return;
       }
 
@@ -266,7 +227,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         submitBtn.textContent = "Submit application →";
       }
 
-      showNotice(res.data?.message || "Unable to submit your application to database.", true);
+      showNotice(saveRes?.message || "Unable to submit your application. Please try again.", true);
     });
   }
 });

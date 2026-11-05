@@ -3,34 +3,17 @@
 document.addEventListener("DOMContentLoaded", async () => {
   let jobs = [];
 
-  // 1. Fetch real active jobs from MySQL backend
+  // Load all jobs from XML + LocalStorage custom posted jobs
   try {
-    const res = await jobPortalApiFetch("/api/jobs");
-    if (res.ok && res.data && Array.isArray(res.data.jobs) && res.data.jobs.length > 0) {
-      jobs = res.data.jobs.map(j => ({
-        id: j.id,
-        title: j.title,
-        company: j.company,
-        category: j.category,
-        type: j.type,
-        work: j.work_mode || "On-site",
-        location: j.location,
-        salary: j.salary,
-        experience: j.experience || "1-3 years",
-        vacancies: j.vacancies || 1,
-        skills: Array.isArray(j.skills) ? j.skills : [],
-        logo: j.logo || (j.company ? j.company.charAt(0).toUpperCase() : "J"),
-        description: j.description
-      }));
-    }
+    jobs = await jobPortalGetAllJobs();
   } catch (err) {
-    console.warn("Could not fetch jobs from MySQL API, falling back to XML data.", err);
+    if (window.JobPortalData) {
+      jobs = await window.JobPortalData.loadJobsData();
+    }
   }
 
-  // 2. Fallback to XML jobs loader if API failed
-  if (jobs.length === 0 && window.JobPortalData) {
-    jobs = await window.JobPortalData.loadJobsData();
-  }
+  // Filter only active jobs
+  jobs = (jobs || []).filter(j => j && j.is_active !== 0);
 
   const list = document.getElementById("jobsList");
   if (!list) return;

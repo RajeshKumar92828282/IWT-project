@@ -21,27 +21,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // Load candidate applications from MySQL backend
-  let applications = [];
-  try {
-    const res = await jobPortalApiFetch("/api/candidate/applications");
-    if (res.ok && res.data && Array.isArray(res.data.applications)) {
-      applications = res.data.applications;
-    } else {
-      applications = jobPortalGetUserApplications(user);
-    }
-  } catch (e) {
-    applications = jobPortalGetUserApplications(user);
-  }
-
-  // Load candidate profile from MySQL
-  let profile = jobPortalGetProfile(user);
-  try {
-    const profRes = await jobPortalApiFetch("/api/candidate/profile");
-    if (profRes.ok && profRes.data && profRes.data.profile) {
-      profile = { ...profile, ...profRes.data.profile };
-    }
-  } catch (e) {}
+  // Load candidate applications and profile from LocalStorage
+  const applications = jobPortalGetUserApplications(user);
+  const profile = jobPortalGetProfile(user);
 
   const displayName = profile.fullName || user.name;
   const savedJobIds = jobPortalGetSavedJobs(user);

@@ -38,28 +38,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     notice.textContent = "";
   }
 
-  async function loadProfile() {
-    let saved = jobPortalGetProfile(session);
-
-    // Fetch from MySQL API
-    try {
-      const res = await jobPortalApiFetch("/api/candidate/profile");
-      if (res.ok && res.data && res.data.profile) {
-        const p = res.data.profile;
-        saved = {
-          fullName: p.name || saved.fullName || session.name,
-          phone: p.phone || saved.phone,
-          location: p.location || saved.location,
-          headline: p.headline || saved.headline,
-          bio: p.bio || saved.bio,
-          skills: p.skills || saved.skills,
-          degree: p.degree || saved.degree,
-          institution: p.institution || saved.institution,
-          graduationYear: p.graduation_year || saved.graduationYear,
-          portfolio: p.portfolio_url || saved.portfolio
-        };
-      }
-    } catch (e) {}
+  function loadProfile() {
+    const saved = jobPortalGetProfile(session) || {};
 
     const fn = document.getElementById("fullName");
     if (fn) fn.value = saved.fullName || session.name || "";
@@ -186,20 +166,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         submitBtn.textContent = "Saving to Database...";
       }
 
-      // Update in MySQL
-      try {
-        await jobPortalApiFetch("/api/candidate/profile", {
-          method: "PUT",
-          body: JSON.stringify(data)
-        });
-      } catch (e) {}
-
-      // Keep local storage synchronized
+      // Save profile to LocalStorage
       jobPortalWriteJSON(storageKey(), data);
       jobPortalSetSession({ ...session, name: data.fullName });
 
       jobPortalUpdateNavigation();
-      showNotice("Your profile has been saved successfully in the database.");
+      showNotice("Your profile has been saved successfully.");
 
       if (submitBtn) {
         submitBtn.disabled = false;

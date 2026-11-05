@@ -243,22 +243,12 @@ function renderApplications() {
     .join("");
 }
 
-// Fetch applications from MySQL backend
-async function loadCandidateApplications() {
+// Load applications for current candidate
+function loadCandidateApplications() {
   const session = getSession();
   if (!session) return;
 
-  try {
-    const res = await jobPortalApiFetch("/api/candidate/applications");
-    if (res.ok && res.data && Array.isArray(res.data.applications)) {
-      candidateApplicationsCache = res.data.applications;
-    } else {
-      candidateApplicationsCache = jobPortalGetUserApplications(session);
-    }
-  } catch (e) {
-    candidateApplicationsCache = jobPortalGetUserApplications(session);
-  }
-
+  candidateApplicationsCache = jobPortalGetUserApplications(session);
   renderApplications();
 }
 

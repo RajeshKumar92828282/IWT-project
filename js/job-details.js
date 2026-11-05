@@ -5,39 +5,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const jobId = params.get("id") || "frontend";
   let job = null;
 
-  // 1. Fetch single job from MySQL backend
+  // Load job from all available jobs (custom posted + XML)
   try {
-    const res = await jobPortalApiFetch(`/api/jobs/${jobId}`);
-    if (res.ok && res.data && res.data.job) {
-      const j = res.data.job;
-      job = {
-        id: j.id,
-        title: j.title,
-        company: j.company,
-        logo: j.logo || (j.company ? j.company.charAt(0).toUpperCase() : "J"),
-        category: j.category,
-        type: j.type,
-        work: j.work_mode || "On-site",
-        location: j.location,
-        salary: j.salary,
-        experience: j.experience || "1-3 years",
-        vacancies: j.vacancies || 1,
-        education: j.education || "Bachelor Degree",
-        deadline: j.deadline || "",
-        description: j.description,
-        responsibilities: Array.isArray(j.responsibilities) ? j.responsibilities : [],
-        requirements: Array.isArray(j.requirements) ? j.requirements : [],
-        skills: Array.isArray(j.skills) ? j.skills : []
-      };
-    }
+    const allJobs = await jobPortalGetAllJobs();
+    job = allJobs.find(item => item.id === jobId);
   } catch (err) {
-    console.warn("API request for job details failed, checking XML fallback.", err);
-  }
-
-  // 2. Fallback to XML
-  if (!job && window.JobPortalData) {
-    const xmlJobs = await window.JobPortalData.loadJobsData();
-    job = xmlJobs.find(item => item.id === jobId);
+    if (window.JobPortalData) {
+      const xmlJobs = await window.JobPortalData.loadJobsData();
+      job = xmlJobs.find(item => item.id === jobId);
+    }
   }
 
   const content = document.getElementById("jobDetailContent");
